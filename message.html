@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Messages</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; font-family:Arial,Helvetica,sans-serif; }
+body { background:#f4f5f8; min-height:100vh; display:flex; flex-direction:column; }
+
+.hamburger {
+    position:fixed; top:20px; left:20px; z-index:2000;
+    background:white; border:none; width:44px; height:44px;
+    border-radius:12px; cursor:pointer;
+    display:flex; flex-direction:column; justify-content:center; align-items:center; gap:5px;
+    box-shadow:0 4px 16px rgba(0,0,0,.12); transition:background .2s;
+}
+.hamburger:hover { background:#f0ebff; }
+.hamburger span { display:block; width:20px; height:2px; background:#6d28d9; border-radius:2px; transition:.3s; }
+.hamburger.active span:nth-child(1) { transform:translateY(7px) rotate(45deg); }
+.hamburger.active span:nth-child(2) { opacity:0; }
+.hamburger.active span:nth-child(3) { transform:translateY(-7px) rotate(-45deg); }
+
+.overlay { position:fixed; inset:0; background:rgba(0,0,0,.35); z-index:1500; opacity:0; pointer-events:none; transition:opacity .3s; }
+.overlay.active { opacity:1; pointer-events:all; }
+
+.sidebar {
+    position:fixed; top:0; left:0; height:100vh; width:260px;
+    background:white; z-index:1600;
+    transform:translateX(-100%); transition:transform .3s cubic-bezier(.4,0,.2,1);
+    display:flex; flex-direction:column;
+    box-shadow:4px 0 30px rgba(0,0,0,.12);
+}
+.sidebar.active { transform:translateX(0); }
+.sidebar-header { padding:28px 24px 20px; border-bottom:1px solid #f0ebff; }
+.sidebar-logo { font-size:22px; font-weight:bold; color:#6d28d9; letter-spacing:-0.5px; }
+.sidebar-subtitle { font-size:12px; color:#aaa; margin-top:4px; }
+.sidebar-links { list-style:none; padding:16px 12px; flex:1; display:flex; flex-direction:column; gap:4px; }
+.sidebar-links li a { display:flex; align-items:center; text-decoration:none; color:#444; padding:12px 14px; border-radius:10px; font-size:15px; font-weight:500; transition:.2s; }
+.sidebar-links li a:hover, .sidebar-links li a.active { background:#f0ebff; color:#6d28d9; }
+.sidebar-footer { padding:20px 24px; border-top:1px solid #f0ebff; font-size:12px; color:#bbb; }
+
+.page { max-width:680px; margin:0 auto; padding:40px 20px 60px; flex:1; width:100%; }
+
+.page-header {
+    display:flex; align-items:center; gap:12px; margin-bottom:24px;
+    padding-left:56px;
+}
+.back-btn {
+    background:white; border:none; width:36px; height:36px; border-radius:10px;
+    cursor:pointer; font-size:18px; display:none; align-items:center; justify-content:center;
+    box-shadow:0 2px 8px rgba(0,0,0,.1); transition:background .2s; color:#6d28d9;
+}
+.back-btn:hover { background:#f0ebff; }
+.back-btn.visible { display:flex; }
+.page-title { font-size:22px; font-weight:700; color:#111; }
+
+#inboxView { display:block; }
+
+.section-label {
+    font-size:12px; font-weight:700; color:#aaa;
+    letter-spacing:.8px; text-transform:uppercase;
+    margin-bottom:10px; margin-top:4px;
+}
+
+.request-card {
+    background:white; border-radius:14px;
+    padding:18px 20px; box-shadow:0 4px 16px rgba(0,0,0,.07);
+    margin-bottom:10px;
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+}
+.req-info { display:flex; align-items:center; gap:12px; }
+.req-avatar {
+    width:46px; height:46px; border-radius:50%;
+    background:#ede9fe; display:flex; align-items:center;
+    justify-content:center; font-size:17px; font-weight:700; color:#6d28d9; flex-shrink:0;
+}
+.req-name { font-size:15px; font-weight:600; color:#111; }
+.req-sub { font-size:12px; color:#999; margin-top:2px; }
+.req-actions { display:flex; gap:8px; flex-shrink:0; }
+.accept-btn { background:#6d28d9; color:white; border:none; padding:8px 18px; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer; transition:background .2s; }
+.accept-btn:hover { background:#5b21b6; }
+.decline-btn { background:#f3f4f6; color:#555; border:none; padding:8px 18px; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer; transition:background .2s; }
+.decline-btn:hover { background:#e5e7eb; }
+
+.conv-item {
+    background:white; border-radius:14px;
+    padding:16px 20px; box-shadow:0 4px 16px rgba(0,0,0,.07);
+    margin-bottom:10px; display:flex; align-items:center; gap:14px;
+    cursor:pointer; transition:background .2s;
+}
+.conv-item:hover { background:#f9f7ff; }
+.conv-avatar {
+    width:46px; height:46px; border-radius:50%;
+    background:#ede9fe; display:flex; align-items:center;
+    justify-content:center; font-size:17px; font-weight:700; color:#6d28d9; flex-shrink:0;
+}
+.conv-info { flex:1; min-width:0; }
+.conv-name { font-size:15px; font-weight:600; color:#111; }
+.conv-preview { font-size:13px; color:#999; margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.conv-time { font-size:12px; color:#bbb; flex-shrink:0; }
+
+.empty-state { text-align:center; padding:60px 20px; color:#bbb; font-size:15px; }
+.empty-icon { font-size:48px; margin-bottom:12px; }
+
+#chatView { display:none; }
+
+.chat-wrap {
+    background:white; border-radius:16px;
+    box-shadow:0 4px 20px rgba(0,0,0,.07);
+    display:flex; flex-direction:column; height:520px; overflow:hidden;
+}
+.chat-header {
+    background:linear-gradient(135deg,#6d28d9,#8b5cf6);
+    color:white; padding:16px 20px;
+    display:flex; align-items:center; gap:12px;
+    border-radius:16px 16px 0 0;
+}
+.chat-header-avatar {
+    width:40px; height:40px; border-radius:50%;
+    background:rgba(255,255,255,.25);
+    display:flex; align-items:center; justify-content:center;
+    font-size:16px; font-weight:700;
+}
+.chat-header-name { font-size:16px; font-weight:600; }
+.chat-header-status { font-size:12px; opacity:.75; margin-top:1px; }
+
+.chat-messages {
+    flex:1; overflow-y:auto; padding:20px;
+    display:flex; flex-direction:column; gap:12px;
+    background:#f9f8ff;
+}
+.msg { display:flex; flex-direction:column; max-width:68%; }
+.msg.me { align-self:flex-end; align-items:flex-end; }
+.msg.them { align-self:flex-start; align-items:flex-start; }
+.msg-bubble { padding:10px 15px; border-radius:18px; font-size:14px; line-height:1.5; }
+.msg.me .msg-bubble { background:#6d28d9; color:white; border-bottom-right-radius:4px; }
+.msg.them .msg-bubble { background:white; color:#333; border-bottom-left-radius:4px; box-shadow:0 1px 4px rgba(0,0,0,.08); }
+.msg-time { font-size:11px; color:#bbb; margin-top:3px; }
+
+.chat-input-wrap {
+    padding:14px 16px; border-top:1px solid #f0ebff;
+    display:flex; gap:10px; background:white;
+    border-radius:0 0 16px 16px;
+}
+.chat-input {
+    flex:1; border:1.5px solid #e5e7eb; border-radius:24px;
+    padding:10px 18px; font-size:14px; outline:none;
+    transition:border-color .2s; font-family:Arial,Helvetica,sans-serif;
+}
+.chat-input:focus { border-color:#6d28d9; }
+.send-btn {
+    background:#6d28d9; color:white; border:none;
+    width:44px; height:44px; border-radius:50%;
+    cursor:pointer; font-size:18px; display:flex;
+    align-items:center; justify-content:center;
+    transition:background .2s; flex-shrink:0;
+}
+.send-btn:hover { background:#5b21b6; }
+
+footer { background:#0f0a1e; color:rgba(255,255,255,.45); text-align:center; padding:28px; font-size:13px; }
+</style>
+</head>
+<body>
+
+<button class="hamburger" id="hamburger" aria-label="Open menu">
+    <span></span><span></span><span></span>
+</button>
+<div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+<aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+        <div class="sidebar-logo">LOGO</div>
+        <div class="sidebar-subtitle">Student Portal</div>
+    </div>
+    <ul class="sidebar-links">
+        <li><a href="home.html">Home</a></li>
+        <li><a href="urprofile.html">Your Profile</a></li>
+        <li><a href="message.html" class="active">Messages</a></li>
+        <li><a href="contact.html">Contact</a></li>
+    </ul>
+    <div class="sidebar-footer">© 2026 Your Website</div>
+</aside>
+
+<div class="page">
+
+    <div class="page-header">
+        <button class="back-btn" id="backBtn" onclick="showInbox()">&#8592;</button>
+        <div class="page-title" id="pageTitle">Messages</div>
+    </div>
+
+    <div id="inboxView">
+        <div id="pendingSection"></div>
+        <div id="convSection"></div>
+        <div class="empty-state" id="emptyState" style="display:none;">
+            <div class="empty-icon">💬</div>
+            <div>No messages yet</div>
+        </div>
+    </div>
+
+    <div id="chatView">
+        <div class="chat-wrap">
+            <div class="chat-header">
+                <div class="chat-header-avatar" id="chatAvatar">V</div>
+                <div>
+                    <div class="chat-header-name" id="chatName">Visitor</div>
+                    <div class="chat-header-status">Connected</div>
+                </div>
+            </div>
+            <div class="chat-messages" id="chatMessages"></div>
+            <div class="chat-input-wrap">
+                <input class="chat-input" id="chatInput" type="text" placeholder="Type a message..." onkeydown="if(event.key==='Enter') sendMessage()">
+                <button class="send-btn" onclick="sendMessage()">&#10148;</button>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<footer>© 2026 Your Website. All Rights Reserved.</footer>
+
+<script>
+function getContacts() {
+    try { return JSON.parse(localStorage.getItem("contacts") || "[]"); } catch(e) { return []; }
+}
+function saveContacts(arr) { localStorage.setItem("contacts", JSON.stringify(arr)); }
+
+function getMsgs(id) {
+    try { return JSON.parse(localStorage.getItem("msgs_" + id) || "[]"); } catch(e) { return []; }
+}
+function saveMsgs(id, msgs) { localStorage.setItem("msgs_" + id, JSON.stringify(msgs)); }
+
+(function migrate() {
+    const oldStatus = localStorage.getItem("chatStatus");
+    const oldMsgs   = localStorage.getItem("chatMessages");
+    if (oldStatus && oldStatus !== "none") {
+        const contacts = getContacts();
+        if (!contacts.find(function(c){ return c.id === "visitor"; })) {
+            contacts.push({ id:"visitor", name:"Visitor", initial:"V", status: oldStatus });
+            saveContacts(contacts);
+            if (oldMsgs) localStorage.setItem("msgs_visitor", oldMsgs);
+        }
+        localStorage.removeItem("chatStatus");
+        localStorage.removeItem("chatMessages");
+    }
+    if (localStorage.getItem("requestSent") === "true") {
+        const contacts = getContacts();
+        if (!contacts.find(function(c){ return c.id === "visitor"; })) {
+            contacts.push({ id:"visitor", name:"Visitor", initial:"V", status:"pending" });
+            saveContacts(contacts);
+        }
+        localStorage.removeItem("requestSent");
+    }
+})();
+
+(function seedTestContacts() {
+    const contacts = getContacts();
+    const seeds = [
+        { id:"ali",  name:"Ali",  initial:"A", status:"accepted" },
+        { id:"sara", name:"Sara", initial:"S", status:"pending"  }
+    ];
+    seeds.forEach(function(s) {
+        if (!contacts.find(function(c){ return c.id === s.id; })) {
+            contacts.push(s);
+            if (s.status === "accepted" && getMsgs(s.id).length === 0) {
+                saveMsgs(s.id, [{ from:"them", text:"Hey! How are you?", time:"10:30 AM" }]);
+            }
+        }
+    });
+    saveContacts(contacts);
+})();
+
+var currentId = null;
+
+function now() {
+    return new Date().toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"});
+}
+function escHtml(str) {
+    return str.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+}
+
+function showInbox() {
+    currentId = null;
+    document.getElementById("inboxView").style.display = "block";
+    document.getElementById("chatView").style.display  = "none";
+    document.getElementById("backBtn").classList.remove("visible");
+    document.getElementById("pageTitle").textContent = "Messages";
+    renderInbox();
+}
+
+function renderInbox() {
+    const contacts = getContacts();
+    const pendingSection = document.getElementById("pendingSection");
+    const convSection    = document.getElementById("convSection");
+    const emptyState     = document.getElementById("emptyState");
+
+    const pending  = contacts.filter(function(c){ return c.status === "pending"; });
+    const accepted = contacts.filter(function(c){ return c.status === "accepted"; });
+
+    pendingSection.innerHTML = "";
+    convSection.innerHTML    = "";
+
+    if (pending.length === 0 && accepted.length === 0) {
+        emptyState.style.display = "block";
+        return;
+    }
+    emptyState.style.display = "none";
+
+    if (pending.length > 0) {
+        var label = document.createElement("div");
+        label.className = "section-label";
+        label.textContent = "Requests";
+        pendingSection.appendChild(label);
+
+        pending.forEach(function(c) {
+            var card = document.createElement("div");
+            card.className = "request-card";
+            card.innerHTML =
+                '<div class="req-info">' +
+                    '<div class="req-avatar">' + c.initial + '</div>' +
+                    '<div><div class="req-name">' + escHtml(c.name) + '</div>' +
+                    '<div class="req-sub">Sent you a connection request</div></div>' +
+                '</div>' +
+                '<div class="req-actions">' +
+                    '<button class="accept-btn" onclick="acceptRequest(\'' + c.id + '\')">Accept</button>' +
+                    '<button class="decline-btn" onclick="declineRequest(\'' + c.id + '\')">Decline</button>' +
+                '</div>';
+            pendingSection.appendChild(card);
+        });
+    }
+
+    if (accepted.length > 0) {
+        var label2 = document.createElement("div");
+        label2.className = "section-label";
+        label2.style.marginTop = pending.length > 0 ? "20px" : "4px";
+        label2.textContent = "Chats";
+        convSection.appendChild(label2);
+
+        accepted.forEach(function(c) {
+            var msgs    = getMsgs(c.id);
+            var last    = msgs.length > 0 ? msgs[msgs.length - 1] : null;
+            var preview = last ? last.text : "No messages yet";
+            var time    = last ? last.time : "";
+
+            var item = document.createElement("div");
+            item.className = "conv-item";
+            item.onclick   = function() { openChat(c.id); };
+            item.innerHTML =
+                '<div class="conv-avatar">' + c.initial + '</div>' +
+                '<div class="conv-info">' +
+                    '<div class="conv-name">' + escHtml(c.name) + '</div>' +
+                    '<div class="conv-preview">' + escHtml(preview) + '</div>' +
+                '</div>' +
+                '<div class="conv-time">' + time + '</div>';
+            convSection.appendChild(item);
+        });
+    }
+}
+
+function openChat(id) {
+    const contacts = getContacts();
+    const contact  = contacts.find(function(c){ return c.id === id; });
+    if (!contact) return;
+
+    currentId = id;
+    document.getElementById("inboxView").style.display = "none";
+    document.getElementById("chatView").style.display  = "block";
+    document.getElementById("backBtn").classList.add("visible");
+    document.getElementById("pageTitle").textContent = contact.name;
+    document.getElementById("chatAvatar").textContent = contact.initial;
+    document.getElementById("chatName").textContent   = contact.name;
+
+    renderMessages(id);
+    document.getElementById("chatInput").focus();
+}
+
+function renderMessages(id) {
+    const msgs = getMsgs(id);
+    const wrap = document.getElementById("chatMessages");
+    wrap.innerHTML = "";
+    msgs.forEach(function(m) {
+        var div = document.createElement("div");
+        div.className = "msg " + (m.from === "me" ? "me" : "them");
+        div.innerHTML =
+            '<div class="msg-bubble">' + escHtml(m.text) + '</div>' +
+            '<div class="msg-time">' + m.time + '</div>';
+        wrap.appendChild(div);
+    });
+    wrap.scrollTop = wrap.scrollHeight;
+}
+
+function sendMessage() {
+    if (!currentId) return;
+    var input = document.getElementById("chatInput");
+    var text  = input.value.trim();
+    if (!text) return;
+    var msgs = getMsgs(currentId);
+    msgs.push({ from:"me", text:text, time:now() });
+    saveMsgs(currentId, msgs);
+    input.value = "";
+    renderMessages(currentId);
+}
+
+function acceptRequest(id) {
+    var contacts = getContacts();
+    var contact  = contacts.find(function(c){ return c.id === id; });
+    if (!contact) return;
+    contact.status = "accepted";
+    saveContacts(contacts);
+    if (getMsgs(id).length === 0) {
+        saveMsgs(id, [{ from:"them", text:"Hi! Thanks for accepting my request.", time:now() }]);
+    }
+    openChat(id);
+}
+
+function declineRequest(id) {
+    var contacts = getContacts();
+    var contact  = contacts.find(function(c){ return c.id === id; });
+    if (!contact) return;
+    contact.status = "declined";
+    saveContacts(contacts);
+    renderInbox();
+}
+
+var hamburger = document.getElementById("hamburger");
+var sidebar   = document.getElementById("sidebar");
+var overlay   = document.getElementById("overlay");
+
+hamburger.addEventListener("click", function() {
+    var open = sidebar.classList.toggle("active");
+    overlay.classList.toggle("active", open);
+    hamburger.classList.toggle("active", open);
+});
+
+function closeSidebar() {
+    sidebar.classList.remove("active");
+    overlay.classList.remove("active");
+    hamburger.classList.remove("active");
+}
+
+showInbox();
+</script>
+
+</body>
+</html>
