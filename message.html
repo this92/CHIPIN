@@ -8,6 +8,7 @@
 * { margin:0; padding:0; box-sizing:border-box; font-family:Arial,Helvetica,sans-serif; }
 body { background:#f4f5f8; min-height:100vh; display:flex; flex-direction:column; }
 
+/* HAMBURGER */
 .hamburger {
     position:fixed; top:20px; left:20px; z-index:2000;
     background:white; border:none; width:44px; height:44px;
@@ -40,11 +41,11 @@ body { background:#f4f5f8; min-height:100vh; display:flex; flex-direction:column
 .sidebar-links li a:hover, .sidebar-links li a.active { background:#f0ebff; color:#6d28d9; }
 .sidebar-footer { padding:20px 24px; border-top:1px solid #f0ebff; font-size:12px; color:#bbb; }
 
+/* PAGE */
 .page { max-width:680px; margin:0 auto; padding:40px 20px 60px; flex:1; width:100%; }
 
 .page-header {
     display:flex; align-items:center; gap:12px; margin-bottom:24px;
-    padding-left:56px;
 }
 .back-btn {
     background:white; border:none; width:36px; height:36px; border-radius:10px;
@@ -55,8 +56,10 @@ body { background:#f4f5f8; min-height:100vh; display:flex; flex-direction:column
 .back-btn.visible { display:flex; }
 .page-title { font-size:22px; font-weight:700; color:#111; }
 
+/* ── INBOX VIEW ── */
 #inboxView { display:block; }
 
+/* Pending requests section */
 .section-label {
     font-size:12px; font-weight:700; color:#aaa;
     letter-spacing:.8px; text-transform:uppercase;
@@ -83,6 +86,7 @@ body { background:#f4f5f8; min-height:100vh; display:flex; flex-direction:column
 .decline-btn { background:#f3f4f6; color:#555; border:none; padding:8px 18px; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer; transition:background .2s; }
 .decline-btn:hover { background:#e5e7eb; }
 
+/* Inbox conversation list */
 .conv-item {
     background:white; border-radius:14px;
     padding:16px 20px; box-shadow:0 4px 16px rgba(0,0,0,.07);
@@ -99,10 +103,12 @@ body { background:#f4f5f8; min-height:100vh; display:flex; flex-direction:column
 .conv-name { font-size:15px; font-weight:600; color:#111; }
 .conv-preview { font-size:13px; color:#999; margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .conv-time { font-size:12px; color:#bbb; flex-shrink:0; }
+.unread-dot { width:10px; height:10px; border-radius:50%; background:#6d28d9; flex-shrink:0; }
 
 .empty-state { text-align:center; padding:60px 20px; color:#bbb; font-size:15px; }
 .empty-icon { font-size:48px; margin-bottom:12px; }
 
+/* ── CHAT VIEW ── */
 #chatView { display:none; }
 
 .chat-wrap {
@@ -176,6 +182,8 @@ footer { background:#0f0a1e; color:rgba(255,255,255,.45); text-align:center; pad
         <li><a href="home.html">Home</a></li>
         <li><a href="urprofile.html">Your Profile</a></li>
         <li><a href="message.html" class="active">Messages</a></li>
+        <li><a href="job.html">Jobs</a></li>
+         <li><a href="brainstorm.html">Brainstorm</a></li>
         <li><a href="contact.html">Contact</a></li>
     </ul>
     <div class="sidebar-footer">© 2026 Your Website</div>
@@ -188,6 +196,7 @@ footer { background:#0f0a1e; color:rgba(255,255,255,.45); text-align:center; pad
         <div class="page-title" id="pageTitle">Messages</div>
     </div>
 
+    <!-- INBOX VIEW -->
     <div id="inboxView">
         <div id="pendingSection"></div>
         <div id="convSection"></div>
@@ -197,6 +206,7 @@ footer { background:#0f0a1e; color:rgba(255,255,255,.45); text-align:center; pad
         </div>
     </div>
 
+    <!-- CHAT VIEW -->
     <div id="chatView">
         <div class="chat-wrap">
             <div class="chat-header">
@@ -219,6 +229,10 @@ footer { background:#0f0a1e; color:rgba(255,255,255,.45); text-align:center; pad
 <footer>© 2026 Your Website. All Rights Reserved.</footer>
 
 <script>
+// ── CONTACTS (test subjects) ──────────────────────────────
+// Each contact: { id, name, status: none|pending|accepted|declined }
+// Messages stored per contact under key "msgs_<id>"
+
 function getContacts() {
     try { return JSON.parse(localStorage.getItem("contacts") || "[]"); } catch(e) { return []; }
 }
@@ -229,6 +243,7 @@ function getMsgs(id) {
 }
 function saveMsgs(id, msgs) { localStorage.setItem("msgs_" + id, JSON.stringify(msgs)); }
 
+// Migrate old single-contact data (from previous version)
 (function migrate() {
     const oldStatus = localStorage.getItem("chatStatus");
     const oldMsgs   = localStorage.getItem("chatMessages");
@@ -242,6 +257,7 @@ function saveMsgs(id, msgs) { localStorage.setItem("msgs_" + id, JSON.stringify(
         localStorage.removeItem("chatStatus");
         localStorage.removeItem("chatMessages");
     }
+    // Also check requestSent (from student_profile.html)
     if (localStorage.getItem("requestSent") === "true") {
         const contacts = getContacts();
         if (!contacts.find(function(c){ return c.id === "visitor"; })) {
@@ -252,6 +268,8 @@ function saveMsgs(id, msgs) { localStorage.setItem("msgs_" + id, JSON.stringify(
     }
 })();
 
+// ── ADD TEST SUBJECTS ─────────────────────────────────────
+// Pre-populate a couple of test contacts so inbox isn't empty
 (function seedTestContacts() {
     const contacts = getContacts();
     const seeds = [
@@ -278,6 +296,7 @@ function escHtml(str) {
     return str.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
 }
 
+// ── INBOX ─────────────────────────────────────────────────
 function showInbox() {
     currentId = null;
     document.getElementById("inboxView").style.display = "block";
@@ -305,6 +324,7 @@ function renderInbox() {
     }
     emptyState.style.display = "none";
 
+    // Pending requests
     if (pending.length > 0) {
         var label = document.createElement("div");
         label.className = "section-label";
@@ -328,6 +348,7 @@ function renderInbox() {
         });
     }
 
+    // Accepted chats
     if (accepted.length > 0) {
         var label2 = document.createElement("div");
         label2.className = "section-label";
@@ -356,6 +377,7 @@ function renderInbox() {
     }
 }
 
+// ── CHAT ──────────────────────────────────────────────────
 function openChat(id) {
     const contacts = getContacts();
     const contact  = contacts.find(function(c){ return c.id === id; });
@@ -400,12 +422,14 @@ function sendMessage() {
     renderMessages(currentId);
 }
 
+// ── REQUEST ACTIONS ───────────────────────────────────────
 function acceptRequest(id) {
     var contacts = getContacts();
     var contact  = contacts.find(function(c){ return c.id === id; });
     if (!contact) return;
     contact.status = "accepted";
     saveContacts(contacts);
+    // Seed a first message from them
     if (getMsgs(id).length === 0) {
         saveMsgs(id, [{ from:"them", text:"Hi! Thanks for accepting my request.", time:now() }]);
     }
@@ -421,6 +445,7 @@ function declineRequest(id) {
     renderInbox();
 }
 
+// ── SIDEBAR ───────────────────────────────────────────────
 var hamburger = document.getElementById("hamburger");
 var sidebar   = document.getElementById("sidebar");
 var overlay   = document.getElementById("overlay");
@@ -437,6 +462,7 @@ function closeSidebar() {
     hamburger.classList.remove("active");
 }
 
+// ── INIT ──────────────────────────────────────────────────
 showInbox();
 </script>
 

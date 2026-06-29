@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Brainstorm</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; font-family:Arial,Helvetica,sans-serif; }
+body { background:#f4f5f8; min-height:100vh; display:flex; flex-direction:column; }
+
+/* HAMBURGER */
+.hamburger {
+    position:fixed; top:20px; left:20px; z-index:2000;
+    background:white; border:none; width:44px; height:44px;
+    border-radius:12px; cursor:pointer;
+    display:flex; flex-direction:column; justify-content:center; align-items:center; gap:5px;
+    box-shadow:0 4px 16px rgba(0,0,0,.12); transition:background .2s;
+}
+.hamburger:hover { background:#f0ebff; }
+.hamburger span { display:block; width:20px; height:2px; background:#6d28d9; border-radius:2px; transition:.3s; }
+.hamburger.active span:nth-child(1) { transform:translateY(7px) rotate(45deg); }
+.hamburger.active span:nth-child(2) { opacity:0; }
+.hamburger.active span:nth-child(3) { transform:translateY(-7px) rotate(-45deg); }
+.overlay { position:fixed; inset:0; background:rgba(0,0,0,.4); z-index:1500; opacity:0; pointer-events:none; transition:opacity .3s; }
+.overlay.active { opacity:1; pointer-events:all; }
+.sidebar {
+    position:fixed; top:0; left:0; height:100vh; width:260px;
+    background:white; z-index:1600;
+    transform:translateX(-100%); transition:transform .3s cubic-bezier(.4,0,.2,1);
+    display:flex; flex-direction:column; box-shadow:4px 0 30px rgba(0,0,0,.12);
+}
+.sidebar.active { transform:translateX(0); }
+.sidebar-header { padding:28px 24px 20px; border-bottom:1px solid #f0ebff; }
+.sidebar-logo { font-size:22px; font-weight:bold; color:#6d28d9; }
+.sidebar-subtitle { font-size:12px; color:#aaa; margin-top:4px; }
+.sidebar-links { list-style:none; padding:16px 12px; flex:1; display:flex; flex-direction:column; gap:4px; }
+.sidebar-links li a { display:flex; align-items:center; text-decoration:none; color:#444; padding:12px 14px; border-radius:10px; font-size:15px; font-weight:500; transition:.2s; }
+.sidebar-links li a:hover, .sidebar-links li a.active { background:#f0ebff; color:#6d28d9; }
+.sidebar-footer { padding:20px 24px; border-top:1px solid #f0ebff; font-size:12px; color:#bbb; }
+
+/* PAGE */
+.page { max-width:680px; margin:0 auto; padding:36px 20px 60px; flex:1; width:100%; }
+
+.page-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; }
+.page-title { font-size:22px; font-weight:700; color:#111; }
+.new-post-btn {
+    background:#6d28d9; color:white; border:none;
+    padding:10px 20px; border-radius:10px; font-size:14px; font-weight:600;
+    cursor:pointer; transition:background .2s;
+}
+.new-post-btn:hover { background:#5b21b6; }
+
+/* POST CARD */
+.post-card {
+    background:white; border-radius:16px;
+    box-shadow:0 4px 16px rgba(0,0,0,.07); margin-bottom:16px;
+    overflow:hidden; display:flex;
+}
+
+/* VOTE SIDEBAR */
+.vote-col {
+    width:52px; background:#f9f7ff;
+    display:flex; flex-direction:column; align-items:center;
+    padding:14px 0; gap:4px; flex-shrink:0;
+    border-right:1px solid #f0ebff;
+}
+.vote-btn {
+    background:none; border:none; cursor:pointer;
+    width:32px; height:32px; border-radius:8px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:18px; color:#bbb; transition:.15s;
+}
+.vote-btn:hover { background:#f0ebff; }
+.vote-btn.up.active { color:#6d28d9; }
+.vote-btn.down.active { color:#e24b4a; }
+.vote-count { font-size:14px; font-weight:700; color:#333; }
+
+/* POST BODY */
+.post-body { padding:16px 18px; flex:1; min-width:0; }
+.post-meta { display:flex; align-items:center; gap:8px; margin-bottom:10px; }
+.post-avatar {
+    width:28px; height:28px; border-radius:50%;
+    background:linear-gradient(135deg,#6d28d9,#a855f7);
+    display:flex; align-items:center; justify-content:center;
+    font-size:11px; font-weight:700; color:white; flex-shrink:0;
+}
+.post-author { font-size:13px; font-weight:600; color:#555; }
+.post-time { font-size:12px; color:#bbb; }
+.post-title { font-size:16px; font-weight:700; color:#111; margin-bottom:8px; line-height:1.4; }
+.post-text { font-size:14px; color:#555; line-height:1.6; margin-bottom:12px; }
+.post-img { width:100%; border-radius:10px; margin-bottom:12px; max-height:360px; object-fit:cover; display:block; cursor:pointer; }
+
+/* SORT BAR */
+.sort-bar { display:flex; gap:8px; margin-bottom:20px; }
+.sort-btn { background:white; border:none; padding:8px 16px; border-radius:20px; font-size:13px; font-weight:600; color:#888; cursor:pointer; transition:.2s; box-shadow:0 2px 8px rgba(0,0,0,.07); }
+.sort-btn.active { background:#6d28d9; color:white; }
+
+/* EMPTY */
+.empty-state { text-align:center; padding:60px 20px; color:#bbb; font-size:15px; }
+.empty-icon { font-size:48px; margin-bottom:12px; }
+
+/* ── WELCOME POPUP ── */
+.welcome-bg {
+    position:fixed; inset:0; background:rgba(0,0,0,.5);
+    z-index:4000; display:flex; align-items:center; justify-content:center; padding:20px;
+}
+.welcome-box {
+    background:white; border-radius:20px; max-width:440px; width:100%;
+    padding:36px 32px; text-align:center;
+    box-shadow:0 24px 60px rgba(0,0,0,.2); animation:popIn .25s;
+}
+.welcome-icon { font-size:52px; margin-bottom:16px; }
+.welcome-title { font-size:22px; font-weight:700; color:#111; margin-bottom:10px; }
+.welcome-text { font-size:14px; color:#777; line-height:1.7; margin-bottom:24px; }
+.welcome-highlight { color:#6d28d9; font-weight:600; }
+.welcome-btn {
+    background:#6d28d9; color:white; border:none;
+    padding:13px 36px; border-radius:10px; font-size:15px; font-weight:700;
+    cursor:pointer; transition:background .2s; width:100%;
+}
+.welcome-btn:hover { background:#5b21b6; }
+.welcome-check { display:flex; align-items:center; gap:8px; justify-content:center; margin-bottom:20px; font-size:13px; color:#888; cursor:pointer; }
+.welcome-check input { accent-color:#6d28d9; width:15px; height:15px; cursor:pointer; }
+
+/* ── CREATE POST MODAL ── */
+.modal-bg {
+    position:fixed; inset:0; background:rgba(0,0,0,.45);
+    z-index:3000; display:none; align-items:center; justify-content:center; padding:20px;
+}
+.modal-bg.open { display:flex; }
+.modal {
+    background:white; border-radius:20px; width:100%; max-width:560px;
+    max-height:92vh; overflow-y:auto;
+    box-shadow:0 20px 60px rgba(0,0,0,.2); animation:popIn .2s;
+}
+@keyframes popIn { from { transform:scale(.95); opacity:0; } to { transform:scale(1); opacity:1; } }
+
+.modal-header {
+    padding:20px 24px 0; display:flex; justify-content:space-between; align-items:center;
+}
+.modal-title { font-size:18px; font-weight:700; color:#111; }
+.modal-close-btn {
+    background:#f4f5f8; border:none; width:32px; height:32px; border-radius:50%;
+    cursor:pointer; font-size:18px; display:flex; align-items:center; justify-content:center; color:#666;
+}
+.modal-close-btn:hover { background:#f0ebff; color:#6d28d9; }
+.modal-body { padding:20px 24px 24px; display:flex; flex-direction:column; gap:14px; }
+
+.m-input, .m-textarea {
+    width:100%; border:1.5px solid #e5e7eb; border-radius:10px;
+    padding:11px 14px; font-size:14px; outline:none;
+    transition:border-color .2s; font-family:Arial,Helvetica,sans-serif; color:#111;
+}
+.m-input:focus, .m-textarea:focus { border-color:#6d28d9; }
+.m-textarea { resize:vertical; min-height:110px; }
+
+/* Image upload area */
+.img-upload-area {
+    border:2px dashed #ddd6fe; border-radius:12px;
+    padding:22px; text-align:center; cursor:pointer;
+    transition:border-color .2s, background .2s;
+}
+.img-upload-area:hover { border-color:#6d28d9; background:#faf8ff; }
+.img-upload-area input { display:none; }
+.img-upload-label { font-size:13px; color:#888; cursor:pointer; }
+.img-upload-label span { color:#6d28d9; font-weight:600; }
+.img-preview { width:100%; border-radius:10px; margin-top:10px; display:none; }
+
+.submit-post-btn {
+    background:#6d28d9; color:white; border:none;
+    padding:13px; border-radius:10px; font-size:15px; font-weight:700;
+    cursor:pointer; transition:background .2s;
+}
+.submit-post-btn:hover { background:#5b21b6; }
+
+/* IMAGE LIGHTBOX */
+.lightbox-bg {
+    position:fixed; inset:0; background:rgba(0,0,0,.85);
+    z-index:5000; display:none; align-items:center; justify-content:center; padding:20px;
+    cursor:pointer;
+}
+.lightbox-bg.open { display:flex; }
+.lightbox-bg img { max-width:100%; max-height:90vh; border-radius:12px; }
+
+/* TOAST */
+.toast {
+    position:fixed; bottom:30px; left:50%; transform:translateX(-50%) translateY(80px);
+    background:#1a1a2e; color:white; padding:13px 26px;
+    border-radius:10px; font-size:14px; font-weight:500;
+    box-shadow:0 8px 24px rgba(0,0,0,.2); opacity:0;
+    transition:all .35s cubic-bezier(.4,0,.2,1); z-index:9999; white-space:nowrap;
+}
+.toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+
+footer { background:#0f0a1e; color:rgba(255,255,255,.45); text-align:center; padding:28px; font-size:13px; }
+</style>
+</head>
+<body>
+
+<button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+<div class="overlay" id="sideOverlay" onclick="closeSidebar()"></div>
+<aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+        <div class="sidebar-logo">LOGO</div>
+        <div class="sidebar-subtitle">Student Portal</div>
+    </div>
+    <ul class="sidebar-links">
+        <li><a href="home.html">Home</a></li>
+        <li><a href="urprofile.html">Your Profile</a></li>
+        <li><a href="message.html">Messages</a></li>
+        <li><a href="job.html">Jobs</a></li>
+        <li><a href="brainstorm.html" class="active">Brainstorm</a></li>
+        <li><a href="contact.html">Contact</a></li>
+    </ul>
+    <div class="sidebar-footer">© 2026 Your Website</div>
+</aside>
+
+<!-- WELCOME POPUP -->
+<div class="welcome-bg" id="welcomeBg">
+    <div class="welcome-box">
+        <div class="welcome-icon">💡</div>
+        <div class="welcome-title">Welcome to Brainstorm</div>
+        <div class="welcome-text">
+            This is your open space to share ideas freely.<br>
+            <span class="welcome-highlight">Everything you post becomes public property</span> — no ownership, no credit. Just pure ideas for everyone to build on.
+        </div>
+        <label class="welcome-check">
+            <input type="checkbox" id="dontShowAgain"> Don't show this again
+        </label>
+        <button class="welcome-btn" onclick="closeWelcome()">Got it, let's go!</button>
+    </div>
+</div>
+
+<!-- CREATE POST MODAL -->
+<div class="modal-bg" id="createModal">
+    <div class="modal">
+        <div class="modal-header">
+            <div class="modal-title">Share your idea</div>
+            <button class="modal-close-btn" onclick="closeCreate()">×</button>
+        </div>
+        <div class="modal-body">
+            <input class="m-input" id="postTitle" type="text" placeholder="Give your idea a title...">
+            <textarea class="m-textarea" id="postText" placeholder="Describe your idea in detail..."></textarea>
+
+            <div class="img-upload-area" onclick="document.getElementById('imgInput').click()">
+                <input type="file" id="imgInput" accept="image/*" onchange="previewImg(this)">
+                <div class="img-upload-label">Click to <span>upload an image</span> (optional)</div>
+                <img class="img-preview" id="imgPreview" alt="Preview">
+            </div>
+
+            <button class="submit-post-btn" onclick="submitPost()">Post Idea</button>
+        </div>
+    </div>
+</div>
+
+<!-- LIGHTBOX -->
+<div class="lightbox-bg" id="lightbox" onclick="closeLightbox()">
+    <img id="lightboxImg" src="" alt="Full image">
+</div>
+
+<div class="page">
+    <div class="page-header">
+        <div class="page-title">Brainstorm</div>
+        <button class="new-post-btn" onclick="openCreate()">+ New Idea</button>
+    </div>
+
+    <div class="sort-bar">
+        <button class="sort-btn active" id="sortHot"  onclick="setSort('hot')">Hot</button>
+        <button class="sort-btn"        id="sortNew"  onclick="setSort('new')">New</button>
+        <button class="sort-btn"        id="sortTop"  onclick="setSort('top')">Top</button>
+    </div>
+
+    <div id="postFeed"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+<footer>© 2026 Your Website. All Rights Reserved.</footer>
+
+<script>
+var currentSort = "hot";
+var imgData     = null;
+
+// ── STORAGE ───────────────────────────────────────────────
+function getPosts()     { try { return JSON.parse(localStorage.getItem("bsPosts") || "[]"); } catch(e) { return []; } }
+function savePosts(p)   { localStorage.setItem("bsPosts", JSON.stringify(p)); }
+function getVotes()     { try { return JSON.parse(localStorage.getItem("bsVotes") || "{}"); } catch(e) { return {}; } }
+function saveVotes(v)   { localStorage.setItem("bsVotes", JSON.stringify(v)); }
+
+// ── SEED POSTS ────────────────────────────────────────────
+(function seed() {
+    if (getPosts().length > 0) return;
+    var now = Date.now();
+    savePosts([
+        { id:"p1", author:"Reza",    initial:"R", title:"AI-powered study planner", text:"What if we had an AI that analyzes your syllabus and auto-generates a personalized weekly study schedule, adjusting based on your exam dates and weak topics?", img:null, votes:42, ts: now - 7200000 },
+        { id:"p2", author:"Ali",     initial:"A", title:"Peer-to-peer skill exchange", text:"A platform where students trade skills — I teach you web dev, you teach me graphic design. No money, just time and knowledge.", img:null, votes:31, ts: now - 3600000 },
+        { id:"p3", author:"Visitor", initial:"V", title:"Campus carbon tracker", text:"An app that lets students log daily activities (food, transport, electricity use) and see their carbon footprint in real time, with tips to reduce it.", img:null, votes:18, ts: now - 1800000 }
+    ]);
+})();
+
+// ── WELCOME ───────────────────────────────────────────────
+(function checkWelcome() {
+    if (localStorage.getItem("bsWelcomeSeen") === "true") {
+        document.getElementById("welcomeBg").style.display = "none";
+    }
+})();
+
+function closeWelcome() {
+    if (document.getElementById("dontShowAgain").checked) {
+        localStorage.setItem("bsWelcomeSeen", "true");
+    }
+    document.getElementById("welcomeBg").style.display = "none";
+}
+
+// ── SORT ──────────────────────────────────────────────────
+function setSort(s) {
+    currentSort = s;
+    ["Hot","New","Top"].forEach(function(n) {
+        document.getElementById("sort"+n).classList.toggle("active", n.toLowerCase() === s);
+    });
+    renderFeed();
+}
+
+function sortedPosts() {
+    var posts = getPosts().slice();
+    if (currentSort === "new") return posts.sort(function(a,b){ return b.ts - a.ts; });
+    if (currentSort === "top") return posts.sort(function(a,b){ return b.votes - a.votes; });
+    // Hot = score / (age in hours + 2)^1.5
+    return posts.sort(function(a,b) {
+        var ageA = (Date.now() - a.ts) / 3600000;
+        var ageB = (Date.now() - b.ts) / 3600000;
+        var scoreA = a.votes / Math.pow(ageA + 2, 1.5);
+        var scoreB = b.votes / Math.pow(ageB + 2, 1.5);
+        return scoreB - scoreA;
+    });
+}
+
+// ── RENDER FEED ───────────────────────────────────────────
+function renderFeed() {
+    var posts = sortedPosts();
+    var votes = getVotes();
+    var feed  = document.getElementById("postFeed");
+    feed.innerHTML = "";
+
+    if (posts.length === 0) {
+        feed.innerHTML = '<div class="empty-state"><div class="empty-icon">💭</div><div>No ideas yet — be the first!</div></div>';
+        return;
+    }
+
+    posts.forEach(function(p) {
+        var myVote = votes[p.id] || 0; // 1, -1, or 0
+        var card   = document.createElement("div");
+        card.className = "post-card";
+
+        var timeStr = timeAgo(p.ts);
+        var imgHtml = p.img ? '<img class="post-img" src="'+p.img+'" alt="Post image" onclick="openLightbox(\''+p.id+'\')">' : "";
+
+        card.innerHTML =
+            '<div class="vote-col">' +
+                '<button class="vote-btn up '+(myVote===1?"active":"")+'" onclick="vote(\''+p.id+'\',1)">▲</button>' +
+                '<div class="vote-count" id="vc_'+p.id+'">'+(p.votes)+'</div>' +
+                '<button class="vote-btn down '+(myVote===-1?"active":"")+'" onclick="vote(\''+p.id+'\',-1)">▼</button>' +
+            '</div>' +
+            '<div class="post-body">' +
+                '<div class="post-meta">' +
+                    '<div class="post-avatar">'+escHtml(p.initial)+'</div>' +
+                    '<div class="post-author">'+escHtml(p.author)+'</div>' +
+                    '<div class="post-time">• '+timeStr+'</div>' +
+                '</div>' +
+                '<div class="post-title">'+escHtml(p.title)+'</div>' +
+                (p.text ? '<div class="post-text">'+escHtml(p.text)+'</div>' : '') +
+                imgHtml +
+            '</div>';
+
+        feed.appendChild(card);
+    });
+}
+
+// ── VOTE ──────────────────────────────────────────────────
+function vote(id, dir) {
+    var posts  = getPosts();
+    var votes  = getVotes();
+    var post   = posts.find(function(p){ return p.id === id; });
+    if (!post) return;
+
+    var prev = votes[id] || 0;
+    if (prev === dir) {
+        // Toggle off
+        post.votes -= dir;
+        votes[id] = 0;
+    } else {
+        // Switch or new vote
+        post.votes -= prev;
+        post.votes += dir;
+        votes[id] = dir;
+    }
+
+    savePosts(posts);
+    saveVotes(votes);
+    renderFeed();
+}
+
+// ── CREATE POST ───────────────────────────────────────────
+function openCreate() { document.getElementById("createModal").classList.add("open"); }
+function closeCreate() {
+    document.getElementById("createModal").classList.remove("open");
+    document.getElementById("postTitle").value = "";
+    document.getElementById("postText").value  = "";
+    document.getElementById("imgPreview").style.display = "none";
+    imgData = null;
+}
+
+function previewImg(input) {
+    var file = input.files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function(e) {
+        imgData = e.target.result;
+        var prev = document.getElementById("imgPreview");
+        prev.src = imgData;
+        prev.style.display = "block";
+    };
+    reader.readAsDataURL(file);
+}
+
+function submitPost() {
+    var title = document.getElementById("postTitle").value.trim();
+    var text  = document.getElementById("postText").value.trim();
+    if (!title) { showToast("Please add a title for your idea."); return; }
+
+    var posts = getPosts();
+    posts.unshift({
+        id:      "p" + Date.now(),
+        author:  "You",
+        initial: "Y",
+        title:   title,
+        text:    text,
+        img:     imgData,
+        votes:   1,
+        ts:      Date.now()
+    });
+    savePosts(posts);
+
+    var votes = getVotes();
+    votes["p"+Date.now()] = 1;
+    saveVotes(votes);
+
+    closeCreate();
+    setSort("new");
+    showToast("Idea shared with the world!");
+}
+
+// ── LIGHTBOX ──────────────────────────────────────────────
+function openLightbox(id) {
+    var posts = getPosts();
+    var post  = posts.find(function(p){ return p.id === id; });
+    if (!post || !post.img) return;
+    document.getElementById("lightboxImg").src = post.img;
+    document.getElementById("lightbox").classList.add("open");
+}
+function closeLightbox() { document.getElementById("lightbox").classList.remove("open"); }
+
+// ── UTILS ─────────────────────────────────────────────────
+function escHtml(str) { return String(str).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+function timeAgo(ts) {
+    var diff = Math.floor((Date.now() - ts) / 1000);
+    if (diff < 60)   return diff + "s ago";
+    if (diff < 3600) return Math.floor(diff/60) + "m ago";
+    if (diff < 86400)return Math.floor(diff/3600) + "h ago";
+    return Math.floor(diff/86400) + "d ago";
+}
+function showToast(msg) {
+    var t = document.getElementById("toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    setTimeout(function(){ t.classList.remove("show"); }, 3000);
+}
+
+// ── SIDEBAR ───────────────────────────────────────────────
+var hamburger  = document.getElementById("hamburger");
+var sidebar    = document.getElementById("sidebar");
+var sideOverlay= document.getElementById("sideOverlay");
+hamburger.addEventListener("click", function() {
+    var open = sidebar.classList.toggle("active");
+    sideOverlay.classList.toggle("active", open);
+    hamburger.classList.toggle("active", open);
+});
+function closeSidebar() {
+    sidebar.classList.remove("active");
+    sideOverlay.classList.remove("active");
+    hamburger.classList.remove("active");
+}
+
+// ── INIT ──────────────────────────────────────────────────
+renderFeed();
+</script>
+</body>
+</html>

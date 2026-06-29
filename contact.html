@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contacts</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; font-family:Arial,Helvetica,sans-serif; }
+body { background:#f4f5f8; min-height:100vh; display:flex; flex-direction:column; }
+
+.hamburger {
+    position:fixed; top:20px; left:20px; z-index:2000;
+    background:white; border:none; width:44px; height:44px;
+    border-radius:12px; cursor:pointer;
+    display:flex; flex-direction:column; justify-content:center; align-items:center; gap:5px;
+    box-shadow:0 4px 16px rgba(0,0,0,.12); transition:background .2s;
+}
+.hamburger:hover { background:#f0ebff; }
+.hamburger span { display:block; width:20px; height:2px; background:#6d28d9; border-radius:2px; transition:.3s; }
+.hamburger.active span:nth-child(1) { transform:translateY(7px) rotate(45deg); }
+.hamburger.active span:nth-child(2) { opacity:0; }
+.hamburger.active span:nth-child(3) { transform:translateY(-7px) rotate(-45deg); }
+.overlay { position:fixed; inset:0; background:rgba(0,0,0,.35); z-index:1500; opacity:0; pointer-events:none; transition:opacity .3s; }
+.overlay.active { opacity:1; pointer-events:all; }
+.sidebar {
+    position:fixed; top:0; left:0; height:100vh; width:260px;
+    background:white; z-index:1600;
+    transform:translateX(-100%); transition:transform .3s cubic-bezier(.4,0,.2,1);
+    display:flex; flex-direction:column; box-shadow:4px 0 30px rgba(0,0,0,.12);
+}
+.sidebar.active { transform:translateX(0); }
+.sidebar-header { padding:28px 24px 20px; border-bottom:1px solid #f0ebff; }
+.sidebar-logo { font-size:22px; font-weight:bold; color:#6d28d9; }
+.sidebar-subtitle { font-size:12px; color:#aaa; margin-top:4px; }
+.sidebar-links { list-style:none; padding:16px 12px; flex:1; display:flex; flex-direction:column; gap:4px; }
+.sidebar-links li a { display:flex; align-items:center; text-decoration:none; color:#444; padding:12px 14px; border-radius:10px; font-size:15px; font-weight:500; transition:.2s; }
+.sidebar-links li a:hover, .sidebar-links li a.active { background:#f0ebff; color:#6d28d9; }
+.sidebar-footer { padding:20px 24px; border-top:1px solid #f0ebff; font-size:12px; color:#bbb; }
+
+/* PAGE */
+.page { max-width:680px; margin:0 auto; padding:36px 20px 60px; flex:1; width:100%; }
+.page-title { font-size:22px; font-weight:700; color:#111; margin-bottom:8px; }
+.page-sub { font-size:14px; color:#aaa; margin-bottom:24px; }
+
+/* TABS */
+.tabs { display:flex; gap:6px; margin-bottom:22px; }
+.tab-btn {
+    padding:9px 20px; border:none; border-radius:20px;
+    font-size:13px; font-weight:600; cursor:pointer;
+    background:white; color:#888;
+    box-shadow:0 2px 8px rgba(0,0,0,.07); transition:.2s;
+}
+.tab-btn.active { background:#6d28d9; color:white; }
+
+/* CONTACT CARD */
+.contact-card {
+    background:white; border-radius:14px;
+    padding:16px 20px; box-shadow:0 4px 16px rgba(0,0,0,.07);
+    margin-bottom:12px; display:flex; align-items:center; gap:14px;
+}
+.contact-avatar {
+    width:50px; height:50px; border-radius:50%;
+    background:linear-gradient(135deg,#6d28d9,#a855f7);
+    display:flex; align-items:center; justify-content:center;
+    font-size:18px; font-weight:700; color:white; flex-shrink:0;
+}
+.contact-info { flex:1; min-width:0; }
+.contact-name { font-size:15px; font-weight:600; color:#111; margin-bottom:3px; }
+.contact-status { font-size:12px; font-weight:600; padding:3px 10px; border-radius:20px; display:inline-block; }
+.status-pending  { background:#fef9ec; color:#b45309; }
+.status-accepted { background:#d1fae5; color:#065f46; }
+.status-declined { background:#fee2e2; color:#991b1b; }
+
+.contact-actions { display:flex; gap:8px; flex-shrink:0; }
+.msg-btn {
+    background:#6d28d9; color:white; border:none;
+    padding:8px 16px; border-radius:8px; font-size:13px; font-weight:600;
+    cursor:pointer; transition:background .2s; text-decoration:none;
+    display:inline-flex; align-items:center;
+}
+.msg-btn:hover { background:#5b21b6; }
+.withdraw-btn {
+    background:#f3f4f6; color:#888; border:none;
+    padding:8px 14px; border-radius:8px; font-size:13px; font-weight:600;
+    cursor:pointer; transition:background .2s;
+}
+.withdraw-btn:hover { background:#fee2e2; color:#991b1b; }
+
+/* EMPTY */
+.empty-state { text-align:center; padding:60px 20px; color:#bbb; font-size:15px; }
+.empty-icon { font-size:48px; margin-bottom:12px; }
+
+/* TOAST */
+.toast {
+    position:fixed; bottom:30px; left:50%; transform:translateX(-50%) translateY(80px);
+    background:#1a1a2e; color:white; padding:13px 26px;
+    border-radius:10px; font-size:14px; font-weight:500;
+    box-shadow:0 8px 24px rgba(0,0,0,.2); opacity:0;
+    transition:all .35s cubic-bezier(.4,0,.2,1); z-index:9999; white-space:nowrap;
+}
+.toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+
+footer { background:#0f0a1e; color:rgba(255,255,255,.45); text-align:center; padding:28px; font-size:13px; }
+</style>
+</head>
+<body>
+
+<button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+<div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+<aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+        <div class="sidebar-logo">LOGO</div>
+        <div class="sidebar-subtitle">Student Portal</div>
+    </div>
+    <ul <ul class="sidebar-links">
+        <li><a href="home.html">Home</a></li>
+        <li><a href="urprofile.html">Your Profile</a></li>
+        <li><a href="message.html">Messages</a></li>
+        <li><a href="job.html">Jobs</a></li>
+        <li><a href="brainstorm.html">Brainstorm</a></li>
+        <li><a href="contact.html">Contact</a></li>
+    </ul>
+    </ul>
+    <div class="sidebar-footer">© 2026 Your Website</div>
+</aside>
+
+<div class="page">
+    <div class="page-title">My Contacts</div>
+    <div class="page-sub">People you've sent connection requests to</div>
+
+    <div class="tabs">
+        <button class="tab-btn active" id="tabAll"      onclick="setTab('all')">All</button>
+        <button class="tab-btn"        id="tabAccepted" onclick="setTab('accepted')">Connected</button>
+        <button class="tab-btn"        id="tabPending"  onclick="setTab('pending')">Pending</button>
+        <button class="tab-btn"        id="tabDeclined" onclick="setTab('declined')">Declined</button>
+    </div>
+
+    <div id="contactList"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+<footer>© 2026 Your Website. All Rights Reserved.</footer>
+
+<script>
+var currentTab = "all";
+
+// ── DATA ─────────────────────────────────────────────────
+// Contacts are stored by message.html under key "contacts"
+// We also seed some outgoing requests here for demo purposes
+function getContacts() {
+    try { return JSON.parse(localStorage.getItem("contacts") || "[]"); } catch(e) { return []; }
+}
+function saveContacts(c) { localStorage.setItem("contacts", JSON.stringify(c)); }
+
+// Seed outgoing sent requests (from visitor's side)
+(function seed() {
+    var contacts = getContacts();
+    var seeds = [
+        { id:"reza", name:"Reza",  initial:"R", status:"accepted", sentByMe:true },
+        { id:"sara", name:"Sara",  initial:"S", status:"pending",  sentByMe:true },
+        { id:"ali",  name:"Ali",   initial:"A", status:"declined", sentByMe:true }
+    ];
+    seeds.forEach(function(s) {
+        if (!contacts.find(function(c){ return c.id === s.id; })) {
+            contacts.push(s);
+        }
+    });
+    saveContacts(contacts);
+})();
+
+// ── TABS ─────────────────────────────────────────────────
+function setTab(tab) {
+    currentTab = tab;
+    ["All","Accepted","Pending","Declined"].forEach(function(t) {
+        document.getElementById("tab"+t).classList.toggle("active", t.toLowerCase() === tab);
+    });
+    render();
+}
+
+// ── RENDER ───────────────────────────────────────────────
+function render() {
+    var contacts = getContacts().filter(function(c){ return c.sentByMe; });
+    if (currentTab !== "all") contacts = contacts.filter(function(c){ return c.status === currentTab; });
+
+    var list = document.getElementById("contactList");
+    list.innerHTML = "";
+
+    if (contacts.length === 0) {
+        list.innerHTML = '<div class="empty-state"><div class="empty-icon">👥</div><div>No contacts here yet</div></div>';
+        return;
+    }
+
+    contacts.forEach(function(c) {
+        var card = document.createElement("div");
+        card.className = "contact-card";
+
+        var statusLabel = c.status === "accepted" ? "Connected" : c.status === "pending" ? "Pending" : "Declined";
+        var statusClass = "status-" + c.status;
+
+        var actions = "";
+        if (c.status === "accepted") {
+            actions += '<a class="msg-btn" href="message.html">Message</a>';
+        }
+        if (c.status === "pending") {
+            actions += '<button class="withdraw-btn" onclick="withdraw(\''+c.id+'\')">Withdraw</button>';
+        }
+        if (c.status === "declined") {
+            actions += '<button class="msg-btn" onclick="resend(\''+c.id+'\')">Resend</button>';
+        }
+
+        card.innerHTML =
+            '<div class="contact-avatar">'+escHtml(c.initial)+'</div>' +
+            '<div class="contact-info">' +
+                '<div class="contact-name">'+escHtml(c.name)+'</div>' +
+                '<span class="contact-status '+statusClass+'">'+statusLabel+'</span>' +
+            '</div>' +
+            '<div class="contact-actions">'+actions+'</div>';
+
+        list.appendChild(card);
+    });
+}
+
+function withdraw(id) {
+    var contacts = getContacts();
+    var c = contacts.find(function(x){ return x.id === id; });
+    if (c) { c.status = "declined"; saveContacts(contacts); }
+    showToast("Request withdrawn.");
+    render();
+}
+
+function resend(id) {
+    var contacts = getContacts();
+    var c = contacts.find(function(x){ return x.id === id; });
+    if (c) { c.status = "pending"; saveContacts(contacts); }
+    showToast("Request sent again!");
+    render();
+}
+
+function escHtml(str) { return String(str).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+function showToast(msg) {
+    var t = document.getElementById("toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    setTimeout(function(){ t.classList.remove("show"); }, 3000);
+}
+
+// ── SIDEBAR ───────────────────────────────────────────────
+var hamburger = document.getElementById("hamburger");
+var sidebar   = document.getElementById("sidebar");
+var overlay   = document.getElementById("overlay");
+hamburger.addEventListener("click", function() {
+    var open = sidebar.classList.toggle("active");
+    overlay.classList.toggle("active", open);
+    hamburger.classList.toggle("active", open);
+});
+function closeSidebar() {
+    sidebar.classList.remove("active");
+    overlay.classList.remove("active");
+    hamburger.classList.remove("active");
+}
+
+render();
+</script>
+</body>
+</html>
