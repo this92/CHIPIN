@@ -1,0 +1,21 @@
+# CHIPIN .gitignore
+
+# Rust / Cargo
+backend/target/
+backend/Cargo.lock
+backend/chipin.db
+backend/chipin.db-wal
+backend/chipin.db-shm
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env
+.env

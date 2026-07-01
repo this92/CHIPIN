@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CHIPIN — View All Mates</title>
+<meta name="description" content="Browse all students in your college room. Filter by year and division.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style/shared.css">
+<style>
+body { background: var(--bg); }
+
+/* PAGE TOP BAND */
+.top-band {
+    background: linear-gradient(135deg, #4c1d95 0%, #7c3aed 100%);
+    padding: 80px 24px 40px;
+    position: relative;
+    overflow: hidden;
+}
+.top-band::before {
+    content:'';
+    position:absolute;
+    inset:0;
+    background-image: linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),
+                      linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);
+    background-size: 36px 36px;
+}
+.top-band-content {
+    position: relative;
+    z-index:1;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+.top-band h1 {
+    font-size: 34px;
+    font-weight: 800;
+    color: white;
+    letter-spacing: -1px;
+    margin-bottom: 6px;
+}
+.top-band p {
+    font-size: 15px;
+    color: rgba(255,255,255,.65);
+}
+.room-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255,255,255,.15);
+    border: 1px solid rgba(255,255,255,.25);
+    color: var(--accent);
+    font-size: 12px;
+    font-weight: 700;
+    padding: 5px 14px;
+    border-radius: 20px;
+    margin-bottom: 14px;
+    letter-spacing: .5px;
+}
+
+/* FILTER BAR */
+.filter-bar {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: -20px;
+    position: relative;
+    z-index: 5;
+}
+.filter-card {
+    background: white;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex: 1;
+    min-width: 280px;
+    flex-wrap: wrap;
+}
+.filter-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-faint);
+    letter-spacing: .5px;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+.filter-pills {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+.fpill {
+    background: var(--bg);
+    border: 1.5px solid var(--border);
+    color: var(--text-muted);
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all .15s;
+    font-family: var(--font);
+    user-select: none;
+}
+.fpill:hover    { border-color: var(--primary-light); color: var(--primary); }
+.fpill.active   { background: var(--primary); border-color: var(--primary); color: white; }
+
+.search-filter {
+    flex: 1;
+    min-width: 200px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--bg);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 9px 14px;
+    transition: border-color .2s;
+}
+.search-filter:focus-within { border-color: var(--primary); }
+.search-filter input {
+    flex:1; border:none; outline:none;
+    font-size: 14px; background: transparent;
+    font-family: var(--font); color: var(--text);
+}
+
+/* MAIN */
+.main { max-width: 1100px; margin: 0 auto; padding: 28px 24px 80px; }
+
+/* STUDENT GRID */
+.students-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 16px;
+}
+
+/* STUDENT CARD */
+.student-card {
+    background: white;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform .2s, box-shadow .2s;
+    text-decoration: none;
+    display: block;
+    border: 1.5px solid transparent;
+    position: relative;
+}
+.student-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--primary-light);
+}
+.student-card-cover {
+    height: 64px;
+    background: linear-gradient(135deg, #4c1d95, #7c3aed, #a855f7);
+    position: relative;
+}
+.student-card-cover-pattern {
+    position: absolute;
+    inset: 0;
+    background-image: repeating-linear-gradient(45deg, rgba(255,255,255,.05) 0, rgba(255,255,255,.05) 1px, transparent 0, transparent 50%);
+    background-size: 12px 12px;
+}
+.student-card-body {
+    padding: 0 16px 18px;
+}
+.student-avatar {
+    width: 54px; height: 54px;
+    border-radius: 50%;
+    border: 3px solid white;
+    background: linear-gradient(135deg, var(--primary), var(--primary-light));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; font-weight: 700; color: white;
+    margin-top: -27px;
+    margin-bottom: 10px;
+    box-shadow: var(--shadow-sm);
+    flex-shrink: 0;
+}
+.student-name {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.student-roll {
+    font-size: 12px;
+    color: var(--text-faint);
+    margin-bottom: 10px;
+}
+.student-tags {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+.student-tag {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 9px;
+    border-radius: 8px;
+    background: var(--primary-bg);
+    color: var(--primary);
+}
+.student-tag.year { background: #fef3c7; color: #92400e; }
+.student-tag.div  { background: #d1fae5; color: #065f46; }
+
+/* online dot */
+.online-dot {
+    position: absolute;
+    top: 12px; right: 12px;
+    width: 8px; height: 8px;
+    background: #10b981;
+    border-radius: 50%;
+    border: 2px solid white;
+}
+
+/* COUNT BAR */
+.count-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 0 20px;
+    border-bottom: 1px solid var(--border-light);
+    margin-bottom: 20px;
+}
+.count-text { font-size: 14px; color: var(--text-muted); }
+.count-text strong { color: var(--text); font-weight: 700; }
+.sort-wrap { display:flex; gap:8px; }
+.sort-btn {
+    background: white;
+    border: 1.5px solid var(--border);
+    padding: 7px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all .15s;
+    font-family: var(--font);
+}
+.sort-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+/* skeleton */
+@keyframes shimmer {
+    0%   { background-position: -400px 0; }
+    100% { background-position: 400px 0; }
+}
+.skeleton {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 400px 100%;
+    animation: shimmer 1.4s infinite;
+    border-radius: 8px;
+}
+
+@media (max-width: 600px) {
+    .top-band h1 { font-size: 24px; }
+    .students-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+    .filter-bar { margin-top: 14px; }
+    .filter-card { padding: 14px 16px; }
+}
+</style>
+</head>
+<body>
+
+<button class="hamburger" id="hamburger" aria-label="Open menu">
+    <span></span><span></span><span></span>
+</button>
+<div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+<aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+        <a href="home.html" class="sidebar-logo">
+            <div class="sidebar-logo-icon">🎓</div>
+            <div class="sidebar-logo-text">CHIPIN</div>
+        </a>
+        <div class="sidebar-subtitle">College Developer Portal</div>
+    </div>
+    <ul class="sidebar-links">
+        <li><a href="home.html"><span class="nav-icon">🏠</span> Home</a></li>
+        <li><a href="mates.html" class="active"><span class="nav-icon">👥</span> View Mates</a></li>
+        <li><a href="urprofile.html"><span class="nav-icon">👤</span> Your Profile</a></li>
+        <li><a href="message.html"><span class="nav-icon">💬</span> Messages</a></li>
+        <li><a href="job.html"><span class="nav-icon">💼</span> Jobs</a></li>
+        <li><a href="brainstorm.html"><span class="nav-icon">💡</span> Brainstorm</a></li>
+        <li><a href="contact.html"><span class="nav-icon">📞</span> Contact</a></li>
+    </ul>
+    <div class="sidebar-footer">
+        <div class="sidebar-user">
+            <div class="sidebar-user-avatar" id="sidebarInitial">?</div>
+            <div>
+                <div class="sidebar-user-name" id="sidebarName">Loading…</div>
+                <div class="sidebar-user-room" id="sidebarRoom"></div>
+            </div>
+        </div>
+        <div style="font-size:11px">© 2026 CHIPIN • College Portal</div>
+    </div>
+</aside>
+
+<!-- TOP BAND -->
+<div class="top-band">
+    <div class="top-band-content">
+        <div class="room-pill" id="roomPill">🏠 Room —</div>
+        <h1>All Mates in Your Room</h1>
+        <p id="bandSub">Browse every student who joined with your room code.</p>
+    </div>
+</div>
+
+<!-- FILTER BAR -->
+<div class="filter-bar">
+    <div class="filter-card">
+        <span class="filter-label">Year</span>
+        <div class="filter-pills" id="yearPills">
+            <span class="fpill active" data-year="all" onclick="setFilter('year','all',this)">All</span>
+            <span class="fpill" data-year="FY"  onclick="setFilter('year','FY',this)">FY</span>
+            <span class="fpill" data-year="SY"  onclick="setFilter('year','SY',this)">SY</span>
+            <span class="fpill" data-year="TY"  onclick="setFilter('year','TY',this)">TY</span>
+        </div>
+    </div>
+    <div class="filter-card">
+        <span class="filter-label">Division</span>
+        <div class="filter-pills" id="divPills">
+            <span class="fpill active" data-div="all" onclick="setFilter('div','all',this)">All</span>
+            <span class="fpill" data-div="A" onclick="setFilter('div','A',this)">A</span>
+            <span class="fpill" data-div="B" onclick="setFilter('div','B',this)">B</span>
+            <span class="fpill" data-div="C" onclick="setFilter('div','C',this)">C</span>
+            <span class="fpill" data-div="D" onclick="setFilter('div','D',this)">D</span>
+        </div>
+    </div>
+    <div class="filter-card" style="flex:1;min-width:220px;">
+        <div class="search-filter">
+            <span>🔍</span>
+            <input type="text" id="nameSearch" placeholder="Search by name…" oninput="applyFilters()">
+        </div>
+    </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+    <div class="count-bar">
+        <div class="count-text">Showing <strong id="countShown">—</strong> of <strong id="countTotal">—</strong> students</div>
+        <div class="sort-wrap">
+            <button class="sort-btn active" onclick="setSort('name',this)">A–Z</button>
+            <button class="sort-btn" onclick="setSort('year',this)">Year</button>
+            <button class="sort-btn" onclick="setSort('div',this)">Div</button>
+        </div>
+    </div>
+    <div class="students-grid" id="studentsGrid"></div>
+    <div class="empty-state" id="emptyState" style="display:none">
+        <div class="empty-icon">🔭</div>
+        <div class="empty-text">No students match your filters.</div>
+    </div>
+</div>
+
+<footer>© 2026 CHIPIN • College Portal</footer>
+<div class="toast" id="toast"></div>
+
+<script>
+const API = 'http://127.0.0.1:8080/api';
+
+const DEMO_STUDENTS = [
+    { id:'1', name:'Reza Hussain',   roll_no:'BCA-FY-A-01', year:'FY', division:'A', skills:['HTML','CSS','JS'],    project_count:2 },
+    { id:'2', name:'Ali Khan',       roll_no:'BCA-FY-B-01', year:'FY', division:'B', skills:['Python','Django'],    project_count:1 },
+    { id:'3', name:'Sara Sharma',    roll_no:'BCA-SY-A-02', year:'SY', division:'A', skills:['React','Node'],       project_count:3 },
+    { id:'4', name:'Priya Mehta',    roll_no:'BCA-SY-C-01', year:'SY', division:'C', skills:['Java','Spring'],      project_count:2 },
+    { id:'5', name:'Dev Patil',      roll_no:'BCA-TY-D-01', year:'TY', division:'D', skills:['Flutter','Dart'],     project_count:4 },
+    { id:'6', name:'Neha Joshi',     roll_no:'BCA-FY-D-02', year:'FY', division:'D', skills:['SQL','PHP'],          project_count:0 },
+    { id:'7', name:'Aryan Gupta',    roll_no:'BCA-SY-B-03', year:'SY', division:'B', skills:['C++','DSA'],          project_count:1 },
+    { id:'8', name:'Meera Singh',    roll_no:'BCA-TY-A-01', year:'TY', division:'A', skills:['ML','Python'],        project_count:5 },
+    { id:'9', name:'Rohan Verma',    roll_no:'BCA-FY-C-01', year:'FY', division:'C', skills:['HTML','JS'],          project_count:0 },
+    { id:'10',name:'Pooja Rao',      roll_no:'BCA-TY-B-01', year:'TY', division:'B', skills:['DevOps','Docker'],    project_count:3 },
+    { id:'11',name:'Kunal Shah',     roll_no:'BCA-SY-D-02', year:'SY', division:'D', skills:['Swift','iOS'],        project_count:2 },
+    { id:'12',name:'Anjali Nair',    roll_no:'BCA-FY-A-02', year:'FY', division:'A', skills:['Figma','UI/UX'],      project_count:1 },
+];
+
+let allStudents = [];
+let currentSort = 'name';
+let filterYear  = 'all';
+let filterDiv   = 'all';
+
+function getStudent() {
+    try { return JSON.parse(localStorage.getItem('chipin_student')); } catch(_) { return null; }
+}
+
+// ── SIDEBAR ────────────────────────────────────────────
+const hamburger = document.getElementById('hamburger');
+const sidebar   = document.getElementById('sidebar');
+const overlay   = document.getElementById('overlay');
+hamburger.addEventListener('click', () => {
+    const open = sidebar.classList.toggle('active');
+    overlay.classList.toggle('active', open);
+    hamburger.classList.toggle('active', open);
+});
+function closeSidebar() {
+    sidebar.classList.remove('active');
+    overlay.classList.remove('active');
+    hamburger.classList.remove('active');
+}
+
+// ── FILTERS ────────────────────────────────────────────
+function setFilter(type, val, el) {
+    if (type === 'year') {
+        filterYear = val;
+        document.querySelectorAll('#yearPills .fpill').forEach(p => p.classList.remove('active'));
+    } else {
+        filterDiv = val;
+        document.querySelectorAll('#divPills .fpill').forEach(p => p.classList.remove('active'));
+    }
+    el.classList.add('active');
+    applyFilters();
+}
+
+function setSort(key, el) {
+    currentSort = key;
+    document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+    el.classList.add('active');
+    applyFilters();
+}
+
+function applyFilters() {
+    const query = document.getElementById('nameSearch').value.trim().toLowerCase();
+    let filtered = allStudents.filter(s => {
+        const matchYear = filterYear === 'all' || s.year === filterYear;
+        const matchDiv  = filterDiv  === 'all' || s.division === filterDiv;
+        const matchName = !query || s.name.toLowerCase().includes(query);
+        return matchYear && matchDiv && matchName;
+    });
+
+    // Sort
+    filtered.sort((a, b) => {
+        if (currentSort === 'name') return a.name.localeCompare(b.name);
+        if (currentSort === 'year') return a.year.localeCompare(b.year) || a.name.localeCompare(b.name);
+        if (currentSort === 'div')  return a.division.localeCompare(b.division) || a.name.localeCompare(b.name);
+        return 0;
+    });
+
+    renderGrid(filtered);
+    document.getElementById('countShown').textContent = filtered.length;
+    document.getElementById('countTotal').textContent  = allStudents.length;
+}
+
+function renderGrid(students) {
+    const grid  = document.getElementById('studentsGrid');
+    const empty = document.getElementById('emptyState');
+    grid.innerHTML = '';
+
+    if (!students.length) {
+        empty.style.display = 'block';
+        return;
+    }
+    empty.style.display = 'none';
+
+    students.forEach((s, i) => {
+        const initials = s.name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+        const isOnline = i % 4 === 0; // Demo: every 4th student "online"
+        const card = document.createElement('a');
+        card.className = 'student-card';
+        card.href = `profile.html?id=${s.id}`;
+        const skillsHtml = (s.skills||[]).slice(0,2).map(sk => `<span class="student-tag">${escHtml(sk)}</span>`).join('');
+        card.innerHTML = `
+            <div class="student-card-cover">
+                <div class="student-card-cover-pattern"></div>
+                ${isOnline ? '<div class="online-dot"></div>' : ''}
+            </div>
+            <div class="student-card-body">
+                <div class="student-avatar">${initials}</div>
+                <div class="student-name">${escHtml(s.name)}</div>
+                <div class="student-roll">${escHtml(s.roll_no)}</div>
+                <div class="student-tags">
+                    <span class="student-tag year">${escHtml(s.year)}</span>
+                    <span class="student-tag div">Div ${escHtml(s.division)}</span>
+                    ${skillsHtml}
+                </div>
+            </div>`;
+        grid.appendChild(card);
+    });
+}
+
+// ── INIT ───────────────────────────────────────────────
+(async function init() {
+    const me = getStudent();
+    if (!me) { window.location.href = 'index.html'; return; }
+
+    const initials = me.name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+    document.getElementById('sidebarInitial').textContent = initials;
+    document.getElementById('sidebarName').textContent    = me.name;
+    document.getElementById('sidebarRoom').textContent    = `Room ${me.room_code} · ${me.year}-${me.division}`;
+    document.getElementById('roomPill').textContent       = `🏠 Room ${me.room_code}`;
+    document.getElementById('bandSub').textContent        = `All BCA students who joined with room code ${me.room_code}.`;
+
+    try {
+        const r = await fetch(`${API}/rooms/${me.room_code}/mates`, { signal: AbortSignal.timeout(4000) });
+        if (!r.ok) throw new Error();
+        allStudents = await r.json();
+    } catch(_) {
+        // Demo fallback
+        allStudents = DEMO_STUDENTS;
+        showToast('Demo mode — showing sample mates (backend offline)');
+    }
+
+    applyFilters();
+})();
+
+function escHtml(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3500);
+}
+</script>
+</body>
+</html>

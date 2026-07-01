@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CHIPIN — Student Profile</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style/shared.css">
+<style>
+body { background: var(--bg); }
+
+.page { max-width: 760px; margin: 0 auto; padding: 36px 20px 80px; }
+
+/* PROFILE HEADER CARD */
+.profile-header-card {
+    background: white;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+    margin-bottom: 20px;
+}
+.cover {
+    height: 160px;
+    background: linear-gradient(135deg,#4c1d95 0%,#7c3aed 50%,#a855f7 100%);
+    position: relative;
+    overflow: hidden;
+}
+.cover-pattern {
+    position:absolute;inset:0;
+    background-image:repeating-linear-gradient(45deg,rgba(255,255,255,.04) 0,rgba(255,255,255,.04) 1px,transparent 0,transparent 50%);
+    background-size: 14px 14px;
+}
+.profile-body { padding: 0 28px 28px; }
+.avatar-row {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-top: -46px;
+    margin-bottom: 14px;
+}
+.avatar {
+    width: 92px; height: 92px;
+    border-radius: 50%;
+    border: 4px solid white;
+    object-fit: cover;
+    background: #e0d7f7;
+    box-shadow: var(--shadow-md);
+    flex-shrink: 0;
+}
+.action-row { display:flex; gap:10px; align-items:center; padding-top:10px; }
+
+.profile-name {
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--text);
+    letter-spacing: -.5px;
+    margin-bottom: 4px;
+}
+.profile-tagline {
+    font-size: 15px;
+    color: var(--primary);
+    font-weight: 500;
+    margin-bottom: 14px;
+}
+.profile-meta {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 0;
+}
+.meta-badge {
+    display:inline-flex; align-items:center; gap:5px;
+    background:var(--bg); color:var(--text-muted);
+    font-size:12px; font-weight:600; padding:5px 12px;
+    border-radius:20px; border:1px solid var(--border);
+}
+
+/* SECTIONS */
+.section { background:white; border-radius:var(--radius-lg); padding:24px 28px; box-shadow:var(--shadow-md); margin-bottom:20px; }
+.section-title { font-size:16px; font-weight:700; color:var(--text); margin-bottom:18px; display:flex; align-items:center; gap:8px; }
+
+.about-text { font-size:15px; color:var(--text-muted); line-height:1.75; }
+
+/* PROJECT FILES */
+.file {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    background: var(--primary-pale);
+    border-left: 4px solid var(--primary);
+    padding: 16px 18px;
+    margin-bottom: 12px;
+    border-radius: 0 var(--radius-md) var(--radius-md) 0;
+    transition: background .2s, transform .2s;
+}
+.file:last-child { margin-bottom:0; }
+.file:hover { background:#eee8ff; transform:translateX(4px); }
+.file-name { font-size:15px; font-weight:600; color:var(--text); }
+.file a {
+    text-decoration:none; background:var(--primary); color:white;
+    padding:9px 20px; border-radius:var(--radius-sm); font-size:13px; font-weight:600;
+    transition:background .2s; font-family:var(--font);
+}
+.file a:hover { background:var(--primary-dark); }
+
+/* SKILLS */
+.skills-wrap { display:flex; flex-wrap:wrap; gap:8px; }
+
+/* TOAST */
+.toast { position:fixed; bottom:28px; left:50%; transform:translateX(-50%) translateY(80px); background:#1a1a2e; color:white; padding:12px 24px; border-radius:var(--radius-md); font-size:14px; font-weight:500; box-shadow:var(--shadow-lg); opacity:0; transition:all .35s cubic-bezier(.4,0,.2,1); z-index:9999; white-space:nowrap; pointer-events:none; }
+.toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+.toast.success { background:var(--success); }
+
+/* connect btn states */
+.btn-connect { min-width:110px; justify-content:center; }
+.btn-connect.sent { background:#d1fae5; color:#065f46; border-color:#a7f3d0; }
+.btn-connect.sent:hover { background:#a7f3d0; }
+
+@media (max-width:600px) {
+    .profile-body { padding:0 16px 20px; }
+    .profile-name { font-size:20px; }
+    .action-row { flex-wrap:wrap; }
+}
+</style>
+</head>
+<body>
+
+<button class="hamburger" id="hamburger" aria-label="Open menu"><span></span><span></span><span></span></button>
+<div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+<aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+        <a href="home.html" class="sidebar-logo">
+            <div class="sidebar-logo-icon">🎓</div>
+            <div class="sidebar-logo-text">CHIPIN</div>
+        </a>
+        <div class="sidebar-subtitle">College Developer Portal</div>
+    </div>
+    <ul class="sidebar-links">
+        <li><a href="home.html"><span class="nav-icon">🏠</span> Home</a></li>
+        <li><a href="mates.html"><span class="nav-icon">👥</span> View Mates</a></li>
+        <li><a href="urprofile.html"><span class="nav-icon">👤</span> Your Profile</a></li>
+        <li><a href="message.html"><span class="nav-icon">💬</span> Messages</a></li>
+        <li><a href="job.html"><span class="nav-icon">💼</span> Jobs</a></li>
+        <li><a href="brainstorm.html"><span class="nav-icon">💡</span> Brainstorm</a></li>
+        <li><a href="contact.html"><span class="nav-icon">📞</span> Contact</a></li>
+    </ul>
+    <div class="sidebar-footer">
+        <div style="font-size:11px">© 2026 CHIPIN • College Portal</div>
+    </div>
+</aside>
+
+<div class="page">
+
+    <!-- PROFILE HEADER -->
+    <div class="profile-header-card">
+        <div class="cover" id="profileCover">
+            <div class="cover-pattern"></div>
+        </div>
+        <div class="profile-body">
+            <div class="avatar-row">
+                <img id="profileAvatar" class="avatar" src="https://cdn-icons-png.flaticon.com/512/149/149071.png" alt="Profile Picture">
+                <div class="action-row">
+                    <a href="home.html" class="btn btn-ghost btn-sm">← Back</a>
+                    <button class="btn btn-primary btn-sm btn-connect" id="connectBtn" onclick="toggleConnect()">Connect</button>
+                </div>
+            </div>
+            <div class="profile-name"    id="profileName">Loading…</div>
+            <div class="profile-tagline" id="profileTagline"></div>
+            <div class="profile-meta"    id="profileMeta"></div>
+        </div>
+    </div>
+
+    <!-- ABOUT -->
+    <div class="section">
+        <div class="section-title">📝 About</div>
+        <p class="about-text" id="aboutText">Loading…</p>
+    </div>
+
+    <!-- HEATMAP -->
+    <div class="section">
+        <div class="section-title">📊 Contributions</div>
+        <div class="heatmap-wrap" id="heatmapWrap"></div>
+        <div style="font-size:12px;color:var(--text-faint);margin-top:10px;" id="totalContribs">0 contributions this year</div>
+    </div>
+
+    <!-- PROJECTS -->
+    <div class="section">
+        <div class="section-title">🗂️ Projects</div>
+        <div id="projectsList"></div>
+    </div>
+
+    <!-- SKILLS -->
+    <div class="section">
+        <div class="section-title">⚡ Skills</div>
+        <div class="skills-wrap" id="skillsWrap"></div>
+    </div>
+
+</div>
+
+<footer>© 2026 CHIPIN • College Portal</footer>
+<div class="toast" id="toast"></div>
+
+<script>
+const API = 'http://127.0.0.1:8080/api';
+
+const DEMO_PROFILES = {
+    '1':  { name:'Reza Hussain',  tagline:'BCA-FY · Div A · Web Dev Enthusiast', roll_no:'BCA-FY-A-01',  year:'FY', division:'A', room_code:'107', about:'Hey! I love building web apps with HTML, CSS & JS. Currently learning Rust.', skills:['HTML','CSS','JavaScript','Rust'], projects:[{name:'Portfolio Website', link:'#'},{name:'CHIPIN Portal',link:'#'}] },
+    '2':  { name:'Ali Khan',      tagline:'BCA-FY · Div B · Python Dev',          roll_no:'BCA-FY-B-01',  year:'FY', division:'B', room_code:'107', about:'Python enthusiast. Building Django apps and exploring ML.',   skills:['Python','Django','SQL'],           projects:[{name:'Django Blog',link:'#'}] },
+    '3':  { name:'Sara Sharma',   tagline:'BCA-SY · Div A · React Dev',           roll_no:'BCA-SY-A-02',  year:'SY', division:'A', room_code:'107', about:'Full-stack developer using React & Node. Loves clean UIs.',    skills:['React','Node.js','MongoDB'],       projects:[{name:'E-commerce App',link:'#'},{name:'Portfolio',link:'#'},{name:'Chat App',link:'#'}] },
+    'dm1':{ name:'Reza Hussain',  tagline:'BCA-FY · Div A',                       roll_no:'BCA-FY-A-01',  year:'FY', division:'A', room_code:'107', about:'',  skills:['HTML','CSS'], projects:[] },
+    'dm2':{ name:'Ali Khan',      tagline:'BCA-FY · Div B',                       roll_no:'BCA-FY-B-01',  year:'FY', division:'B', room_code:'107', about:'',  skills:['Python'],     projects:[] },
+    'dm3':{ name:'Sara Sharma',   tagline:'BCA-SY · Div A',                       roll_no:'BCA-SY-A-02',  year:'SY', division:'A', room_code:'107', about:'',  skills:['React'],      projects:[] },
+};
+
+function getStudent() { try { return JSON.parse(localStorage.getItem('chipin_student')); } catch(_) { return null; } }
+
+// ── SIDEBAR ────────────────────────────────────────────
+const hamburger = document.getElementById('hamburger');
+const sidebar   = document.getElementById('sidebar');
+const overlay   = document.getElementById('overlay');
+hamburger.addEventListener('click', () => {
+    const open = sidebar.classList.toggle('active');
+    overlay.classList.toggle('active', open);
+    hamburger.classList.toggle('active', open);
+});
+function closeSidebar() { sidebar.classList.remove('active'); overlay.classList.remove('active'); hamburger.classList.remove('active'); }
+
+// ── CONNECT ────────────────────────────────────────────
+let targetId = '';
+function toggleConnect() {
+    const btn = document.getElementById('connectBtn');
+    const key = 'connect_' + targetId;
+    const sent = localStorage.getItem(key) === 'true';
+    if (!sent) {
+        localStorage.setItem(key, 'true');
+        btn.textContent = '✅ Connected';
+        btn.classList.add('sent');
+        showToast('Connection request sent!', 'success');
+        // Also add to messages contacts
+        const contacts = JSON.parse(localStorage.getItem('contacts') || '[]');
+        if (!contacts.find(c => c.id === targetId)) {
+            const name = document.getElementById('profileName').textContent;
+            contacts.push({ id: targetId, name, initial: name[0].toUpperCase(), status:'pending' });
+            localStorage.setItem('contacts', JSON.stringify(contacts));
+        }
+    } else {
+        localStorage.removeItem(key);
+        btn.textContent = 'Connect';
+        btn.classList.remove('sent');
+        showToast('Request cancelled.');
+    }
+}
+
+// ── HEATMAP ────────────────────────────────────────────
+function buildHeatmap() {
+    const wrap = document.getElementById('heatmapWrap');
+    const weeks = 26;
+    const grid = document.createElement('div');
+    grid.className = 'heatmap-grid';
+    let total = 0;
+    for (let w = 0; w < weeks; w++) {
+        const col = document.createElement('div');
+        col.className = 'heatmap-col';
+        for (let d = 0; d < 7; d++) {
+            const cell = document.createElement('div');
+            cell.className = 'heatmap-cell';
+            const level = Math.random() < .55 ? 0 : Math.floor(Math.random()*4)+1;
+            const clamped = Math.min(level, 4);
+            if (clamped > 0) { cell.dataset.level = clamped; total += clamped; }
+            col.appendChild(cell);
+        }
+        grid.appendChild(col);
+    }
+    wrap.appendChild(grid);
+    document.getElementById('totalContribs').textContent = `${total} contributions in the last 6 months`;
+}
+
+// ── RENDER PROFILE ─────────────────────────────────────
+function renderProfile(p) {
+    document.title = `${p.name} — CHIPIN`;
+    document.getElementById('profileName').textContent    = p.name;
+    document.getElementById('profileTagline').textContent = p.tagline || `${p.year} · Div ${p.division}`;
+    document.getElementById('aboutText').textContent      = p.about || 'No bio yet.';
+
+    if (p.avatar_url) document.getElementById('profileAvatar').src = p.avatar_url;
+
+    // Meta badges
+    const meta = document.getElementById('profileMeta');
+    [
+        { icon:'📚', text: p.year + ' · Div ' + p.division },
+        { icon:'🆔', text: p.roll_no },
+        { icon:'🏠', text: 'Room ' + p.room_code },
+    ].forEach(b => {
+        const span = document.createElement('span');
+        span.className = 'meta-badge';
+        span.innerHTML = `${b.icon} ${escHtml(b.text)}`;
+        meta.appendChild(span);
+    });
+
+    // Projects
+    const list = document.getElementById('projectsList');
+    if (p.projects && p.projects.length) {
+        p.projects.forEach(proj => {
+            const d = document.createElement('div');
+            d.className = 'file';
+            d.innerHTML = `<div class="file-name">🗂️ ${escHtml(proj.name)}</div>
+                <a href="${escHtml(proj.link||'#')}" target="_blank" rel="noopener">View →</a>`;
+            list.appendChild(d);
+        });
+    } else {
+        list.innerHTML = '<div style="color:var(--text-faint);font-size:14px">No projects shared yet.</div>';
+    }
+
+    // Skills
+    const skillsWrap = document.getElementById('skillsWrap');
+    if (p.skills && p.skills.length) {
+        p.skills.forEach(sk => {
+            const span = document.createElement('span');
+            span.className = 'skill-tag';
+            span.textContent = sk;
+            skillsWrap.appendChild(span);
+        });
+    } else {
+        skillsWrap.innerHTML = '<div style="color:var(--text-faint);font-size:14px">No skills listed yet.</div>';
+    }
+
+    buildHeatmap();
+}
+
+// ── INIT ───────────────────────────────────────────────
+(async function init() {
+    const me = getStudent();
+    if (!me) { window.location.href = 'index.html'; return; }
+
+    // Get student ID from URL
+    const params = new URLSearchParams(window.location.search);
+    targetId = params.get('id') || '';
+
+    if (!targetId) { window.location.href = 'mates.html'; return; }
+
+    // Connect button state
+    const btn = document.getElementById('connectBtn');
+    if (localStorage.getItem('connect_' + targetId) === 'true') {
+        btn.textContent = '✅ Connected';
+        btn.classList.add('sent');
+    }
+
+    // Try loading from backend first
+    try {
+        const r = await fetch(`${API}/students/${targetId}`, { signal: AbortSignal.timeout(3000) });
+        if (!r.ok) throw new Error();
+        const p = await r.json();
+        renderProfile(p);
+    } catch(_) {
+        // Try local profile data (if viewing own profile from mates page)
+        const saved = JSON.parse(localStorage.getItem('profileData_' + targetId) || 'null');
+        const demo  = DEMO_PROFILES[targetId];
+
+        if (saved) {
+            renderProfile({ ...saved, year: me.year, division: me.division, roll_no: me.roll_no, room_code: me.room_code });
+        } else if (demo) {
+            renderProfile(demo);
+        } else {
+            document.getElementById('profileName').textContent    = 'Student #' + targetId;
+            document.getElementById('profileTagline').textContent = 'Profile not available in demo mode.';
+            document.getElementById('aboutText').textContent      = 'Start the Rust backend to load live profiles.';
+            buildHeatmap();
+        }
+    }
+})();
+
+function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function showToast(msg, type) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast show' + (type ? ' '+type : '');
+    setTimeout(() => t.className = 'toast', 3000);
+}
+</script>
+</body>
+</html>

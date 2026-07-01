@@ -1,11 +1,12 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Jobs</title>
 <style>
-* { margin:0; padding:0; box-sizing:border-box; font-family:Arial,Helvetica,sans-serif; }
+* { margin:0; padding:0; box-sizing:border-box; font-family:'Inter',system-ui,sans-serif; }
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 body { background:#f4f5f8; min-height:100vh; display:flex; flex-direction:column; }
 
 /* HAMBURGER */
@@ -57,7 +58,7 @@ body { background:#f4f5f8; min-height:100vh; display:flex; flex-direction:column
 /* SECTION LABEL */
 .section-label { font-size:12px; font-weight:700; color:#aaa; letter-spacing:.8px; text-transform:uppercase; margin-bottom:12px; }
 
-/* ── FEED ── */
+/* â”€â”€ FEED â”€â”€ */
 #feedView { display:block; }
 
 .job-card {
@@ -100,7 +101,7 @@ body { background:#f4f5f8; min-height:100vh; display:flex; flex-direction:column
 .empty-feed { text-align:center; padding:60px 20px; color:#bbb; font-size:15px; }
 .empty-icon { font-size:48px; margin-bottom:12px; }
 
-/* ── POST JOB FORM ── */
+/* â”€â”€ POST JOB FORM â”€â”€ */
 #postView { display:none; }
 
 .form-card { background:white; border-radius:16px; padding:28px; box-shadow:0 4px 16px rgba(0,0,0,.07); }
@@ -130,7 +131,7 @@ body { background:#f4f5f8; min-height:100vh; display:flex; flex-direction:column
 }
 .post-btn:hover { background:#5b21b6; }
 
-/* ── JOB DETAIL MODAL ── */
+/* â”€â”€ JOB DETAIL MODAL â”€â”€ */
 .modal-bg {
     position:fixed; inset:0; background:rgba(0,0,0,.4);
     z-index:3000; display:none; align-items:center; justify-content:center; padding:20px;
@@ -207,18 +208,18 @@ footer { background:#0f0a1e; color:rgba(255,255,255,.45); text-align:center; pad
 <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
 <aside class="sidebar" id="sidebar">
     <div class="sidebar-header">
-        <div class="sidebar-logo">LOGO</div>
-        <div class="sidebar-subtitle">Student Portal</div>
+        <a href="home.html" class="sidebar-logo" style="display:flex;align-items:center;gap:10px;text-decoration:none"><div style="width:32px;height:32px;background:linear-gradient(135deg,#5b21b6,#a78bfa);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px">🎓</div><div style="font-size:19px;font-weight:800;color:#7c3aed;letter-spacing:-0.5px">CHIPIN</div></a>
+        <div class="sidebar-subtitle">College Developer Portal</div>
     </div>
     <ul class="sidebar-links">
-        <li><a href="home.html">Home</a></li>
+        <li><a href="home.html">🏠 Home</a></li><li><a href="mates.html">👥 View Mates</a></li>
         <li><a href="urprofile.html">Your Profile</a></li>
         <li><a href="message.html">Messages</a></li>
         <li><a href="job.html" class="active">Jobs</a></li>
          <li><a href="brainstorm.html">Brainstorm</a></li>
         <li><a href="contact.html">Contact</a></li>
     </ul>
-    <div class="sidebar-footer">© 2026 Your Website</div>
+    <div class="sidebar-footer">Â© 2026 CHIPIN • College Portal</div>
 </aside>
 
 <div class="page">
@@ -285,7 +286,7 @@ footer { background:#0f0a1e; color:rgba(255,255,255,.45); text-align:center; pad
 <div class="modal-bg" id="modalBg" onclick="closeModal(event)">
     <div class="modal" id="modal">
         <div class="modal-header">
-            <button class="modal-close" onclick="closeModalDirect()">×</button>
+            <button class="modal-close" onclick="closeModalDirect()">Ã—</button>
             <div class="modal-job-title" id="mTitle"></div>
             <div class="modal-company" id="mCompany"></div>
         </div>
@@ -312,27 +313,27 @@ footer { background:#0f0a1e; color:rgba(255,255,255,.45); text-align:center; pad
 
 <div class="toast" id="toast"></div>
 
-<footer>© 2026 Your Website. All Rights Reserved.</footer>
+<footer>Â© 2026 CHIPIN • College Portal. All Rights Reserved.</footer>
 
 <script>
-// ── STORAGE ───────────────────────────────────────────────
+// â”€â”€ STORAGE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function getJobs() { try { return JSON.parse(localStorage.getItem("jobs") || "[]"); } catch(e) { return []; } }
 function saveJobs(j) { localStorage.setItem("jobs", JSON.stringify(j)); }
 function getApplied() { try { return JSON.parse(localStorage.getItem("appliedJobs") || "[]"); } catch(e) { return []; } }
 function saveApplied(a) { localStorage.setItem("appliedJobs", JSON.stringify(a)); }
 
-// ── SEED JOBS ─────────────────────────────────────────────
+// â”€â”€ SEED JOBS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 (function seed() {
     if (getJobs().length > 0) return;
     var jobs = [
-        { id:"j1", title:"Frontend Developer", company:"TechCorp", location:"Pune", type:"Full-time", desc:"We are looking for a skilled Frontend Developer to join our team. You will build responsive web interfaces and collaborate with designers and backend engineers.\n\nRequirements:\n• 1+ years experience\n• Strong CSS & JavaScript skills\n• Team player", skills:["HTML","CSS","JavaScript","React"], postedBy:"TechCorp", applicants:[], ts: Date.now()-86400000 },
-        { id:"j2", title:"Backend Intern",     company:"DevStudio", location:"Remote",type:"Internship",desc:"Join our backend team as an intern. Great opportunity to learn Node.js and database design in a real startup environment.\n\nRequirements:\n• Basic knowledge of Node.js or Python\n• Willingness to learn\n• Good communication", skills:["Node.js","MySQL","REST APIs"], postedBy:"DevStudio", applicants:[], ts: Date.now()-43200000 },
-        { id:"j3", title:"UI/UX Designer",     company:"PixelHouse",location:"Mumbai",type:"Freelance", desc:"We need a creative UI/UX designer for a 3-month project. You will design mobile-first interfaces for our client apps.\n\nRequirements:\n• Portfolio required\n• Figma proficiency\n• Eye for modern design", skills:["Figma","Prototyping","Adobe XD"], postedBy:"PixelHouse", applicants:[], ts: Date.now()-3600000 }
+        { id:"j1", title:"Frontend Developer", company:"TechCorp", location:"Pune", type:"Full-time", desc:"We are looking for a skilled Frontend Developer to join our team. You will build responsive web interfaces and collaborate with designers and backend engineers.\n\nRequirements:\nâ€¢ 1+ years experience\nâ€¢ Strong CSS & JavaScript skills\nâ€¢ Team player", skills:["HTML","CSS","JavaScript","React"], postedBy:"TechCorp", applicants:[], ts: Date.now()-86400000 },
+        { id:"j2", title:"Backend Intern",     company:"DevStudio", location:"Remote",type:"Internship",desc:"Join our backend team as an intern. Great opportunity to learn Node.js and database design in a real startup environment.\n\nRequirements:\nâ€¢ Basic knowledge of Node.js or Python\nâ€¢ Willingness to learn\nâ€¢ Good communication", skills:["Node.js","MySQL","REST APIs"], postedBy:"DevStudio", applicants:[], ts: Date.now()-43200000 },
+        { id:"j3", title:"UI/UX Designer",     company:"PixelHouse",location:"Mumbai",type:"Freelance", desc:"We need a creative UI/UX designer for a 3-month project. You will design mobile-first interfaces for our client apps.\n\nRequirements:\nâ€¢ Portfolio required\nâ€¢ Figma proficiency\nâ€¢ Eye for modern design", skills:["Figma","Prototyping","Adobe XD"], postedBy:"PixelHouse", applicants:[], ts: Date.now()-3600000 }
     ];
     saveJobs(jobs);
 })();
 
-// ── FORM SKILLS ───────────────────────────────────────────
+// â”€â”€ FORM SKILLS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 var formSkills = [];
 function addFormSkill() {
     var input = document.getElementById("fSkillInput");
@@ -349,12 +350,12 @@ function renderFormSkills() {
     formSkills.forEach(function(s,i) {
         var tag = document.createElement("div");
         tag.className = "skill-tag";
-        tag.innerHTML = escHtml(s) + ' <button class="skill-remove" onclick="removeFormSkill('+i+')">×</button>';
+        tag.innerHTML = escHtml(s) + ' <button class="skill-remove" onclick="removeFormSkill('+i+')">Ã—</button>';
         wrap.appendChild(tag);
     });
 }
 
-// ── POST JOB ──────────────────────────────────────────────
+// â”€â”€ POST JOB â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function postJob() {
     var title   = document.getElementById("fTitle").value.trim();
     var company = document.getElementById("fCompany").value.trim();
@@ -379,7 +380,7 @@ function postJob() {
     switchMode("feed");
 }
 
-// ── FEED ──────────────────────────────────────────────────
+// â”€â”€ FEED â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function renderFeed() {
     var jobs    = getJobs();
     var applied = getApplied();
@@ -387,7 +388,7 @@ function renderFeed() {
     feed.innerHTML = "";
 
     if (jobs.length === 0) {
-        feed.innerHTML = '<div class="empty-feed"><div class="empty-icon">📋</div><div>No jobs posted yet</div></div>';
+        feed.innerHTML = '<div class="empty-feed"><div class="empty-icon">ðŸ“‹</div><div>No jobs posted yet</div></div>';
         return;
     }
 
@@ -407,14 +408,14 @@ function renderFeed() {
             '</div>' +
             '<div class="job-tags">' + job.skills.slice(0,4).map(function(s){ return '<div class="job-tag">'+escHtml(s)+'</div>'; }).join("") + '</div>' +
             '<div class="job-footer">' +
-                '<div class="job-location">📍 ' + escHtml(job.location) + '</div>' +
+                '<div class="job-location">ðŸ“ ' + escHtml(job.location) + '</div>' +
                 '<button class="apply-btn' + (isApplied?" applied":"") + '" onclick="event.stopPropagation();' + (isApplied?"":"applyJobId('"+job.id+"')") + '">' + (isApplied?"Applied":"Apply") + '</button>' +
             '</div>';
         feed.appendChild(card);
     });
 }
 
-// ── MODAL ─────────────────────────────────────────────────
+// â”€â”€ MODAL â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 var currentJobId = null;
 
 function openModal(id) {
@@ -425,9 +426,9 @@ function openModal(id) {
     currentJobId = id;
 
     document.getElementById("mTitle").textContent   = job.title;
-    document.getElementById("mCompany").textContent = job.company + " • " + job.location;
+    document.getElementById("mCompany").textContent = job.company + " â€¢ " + job.location;
     document.getElementById("mDesc").innerHTML      = escHtml(job.desc).replace(/\n/g,"<br>");
-    document.getElementById("mDetails").textContent = job.type + " • " + job.location;
+    document.getElementById("mDetails").textContent = job.type + " â€¢ " + job.location;
 
     var skillsWrap = document.getElementById("mSkills");
     skillsWrap.innerHTML = job.skills.map(function(s){ return '<div class="modal-tag">'+escHtml(s)+'</div>'; }).join("") || '<span style="color:#bbb;font-size:13px;">None specified</span>';
@@ -481,7 +482,7 @@ function applyJobId(id) {
 function closeModal(e) { if (e.target === document.getElementById("modalBg")) closeModalDirect(); }
 function closeModalDirect() { document.getElementById("modalBg").classList.remove("open"); currentJobId = null; }
 
-// ── MODE SWITCH ───────────────────────────────────────────
+// â”€â”€ MODE SWITCH â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function switchMode(mode) {
     document.getElementById("feedView").style.display = mode === "feed" ? "block" : "none";
     document.getElementById("postView").style.display = mode === "post" ? "block" : "none";
@@ -490,7 +491,7 @@ function switchMode(mode) {
     if (mode === "feed") renderFeed();
 }
 
-// ── UTILS ─────────────────────────────────────────────────
+// â”€â”€ UTILS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function escHtml(str) { return String(str).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
 function nowStr() { return new Date().toLocaleString([], {month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"}); }
 function showToast(msg) {
@@ -500,7 +501,7 @@ function showToast(msg) {
     setTimeout(function(){ t.classList.remove("show"); }, 3000);
 }
 
-// ── SIDEBAR ───────────────────────────────────────────────
+// â”€â”€ SIDEBAR â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 var hamburger = document.getElementById("hamburger");
 var sidebar   = document.getElementById("sidebar");
 var overlay   = document.getElementById("overlay");
@@ -515,7 +516,7 @@ function closeSidebar() {
     hamburger.classList.remove("active");
 }
 
-// ── INIT ──────────────────────────────────────────────────
+// â”€â”€ INIT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 renderFeed();
 </script>
 </body>

@@ -1,11 +1,12 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Messages</title>
 <style>
-* { margin:0; padding:0; box-sizing:border-box; font-family:Arial,Helvetica,sans-serif; }
+* { margin:0; padding:0; box-sizing:border-box; font-family:'Inter',system-ui,sans-serif; }
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 body { background:#f4f5f8; min-height:100vh; display:flex; flex-direction:column; }
 
 /* HAMBURGER */
@@ -56,7 +57,7 @@ body { background:#f4f5f8; min-height:100vh; display:flex; flex-direction:column
 .back-btn.visible { display:flex; }
 .page-title { font-size:22px; font-weight:700; color:#111; }
 
-/* ── INBOX VIEW ── */
+/* â”€â”€ INBOX VIEW â”€â”€ */
 #inboxView { display:block; }
 
 /* Pending requests section */
@@ -108,7 +109,7 @@ body { background:#f4f5f8; min-height:100vh; display:flex; flex-direction:column
 .empty-state { text-align:center; padding:60px 20px; color:#bbb; font-size:15px; }
 .empty-icon { font-size:48px; margin-bottom:12px; }
 
-/* ── CHAT VIEW ── */
+/* â”€â”€ CHAT VIEW â”€â”€ */
 #chatView { display:none; }
 
 .chat-wrap {
@@ -175,18 +176,18 @@ footer { background:#0f0a1e; color:rgba(255,255,255,.45); text-align:center; pad
 <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
 <aside class="sidebar" id="sidebar">
     <div class="sidebar-header">
-        <div class="sidebar-logo">LOGO</div>
-        <div class="sidebar-subtitle">Student Portal</div>
+        <a href="home.html" class="sidebar-logo" style="display:flex;align-items:center;gap:10px;text-decoration:none"><div style="width:32px;height:32px;background:linear-gradient(135deg,#5b21b6,#a78bfa);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px">🎓</div><div style="font-size:19px;font-weight:800;color:#7c3aed;letter-spacing:-0.5px">CHIPIN</div></a>
+        <div class="sidebar-subtitle">College Developer Portal</div>
     </div>
     <ul class="sidebar-links">
-        <li><a href="home.html">Home</a></li>
+        <li><a href="home.html">🏠 Home</a></li><li><a href="mates.html">👥 View Mates</a></li>
         <li><a href="urprofile.html">Your Profile</a></li>
         <li><a href="message.html" class="active">Messages</a></li>
         <li><a href="job.html">Jobs</a></li>
          <li><a href="brainstorm.html">Brainstorm</a></li>
         <li><a href="contact.html">Contact</a></li>
     </ul>
-    <div class="sidebar-footer">© 2026 Your Website</div>
+    <div class="sidebar-footer">Â© 2026 CHIPIN • College Portal</div>
 </aside>
 
 <div class="page">
@@ -201,7 +202,7 @@ footer { background:#0f0a1e; color:rgba(255,255,255,.45); text-align:center; pad
         <div id="pendingSection"></div>
         <div id="convSection"></div>
         <div class="empty-state" id="emptyState" style="display:none;">
-            <div class="empty-icon">💬</div>
+            <div class="empty-icon">ðŸ’¬</div>
             <div>No messages yet</div>
         </div>
     </div>
@@ -226,10 +227,10 @@ footer { background:#0f0a1e; color:rgba(255,255,255,.45); text-align:center; pad
 
 </div>
 
-<footer>© 2026 Your Website. All Rights Reserved.</footer>
+<footer>Â© 2026 CHIPIN • College Portal. All Rights Reserved.</footer>
 
 <script>
-// ── CONTACTS (test subjects) ──────────────────────────────
+// â”€â”€ CONTACTS (test subjects) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Each contact: { id, name, status: none|pending|accepted|declined }
 // Messages stored per contact under key "msgs_<id>"
 
@@ -268,7 +269,7 @@ function saveMsgs(id, msgs) { localStorage.setItem("msgs_" + id, JSON.stringify(
     }
 })();
 
-// ── ADD TEST SUBJECTS ─────────────────────────────────────
+// â”€â”€ ADD TEST SUBJECTS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Pre-populate a couple of test contacts so inbox isn't empty
 (function seedTestContacts() {
     const contacts = getContacts();
@@ -296,7 +297,7 @@ function escHtml(str) {
     return str.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
 }
 
-// ── INBOX ─────────────────────────────────────────────────
+// â”€â”€ INBOX â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function showInbox() {
     currentId = null;
     document.getElementById("inboxView").style.display = "block";
@@ -377,7 +378,7 @@ function renderInbox() {
     }
 }
 
-// ── CHAT ──────────────────────────────────────────────────
+// â”€â”€ CHAT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function openChat(id) {
     const contacts = getContacts();
     const contact  = contacts.find(function(c){ return c.id === id; });
@@ -422,7 +423,7 @@ function sendMessage() {
     renderMessages(currentId);
 }
 
-// ── REQUEST ACTIONS ───────────────────────────────────────
+// â”€â”€ REQUEST ACTIONS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function acceptRequest(id) {
     var contacts = getContacts();
     var contact  = contacts.find(function(c){ return c.id === id; });
@@ -445,7 +446,7 @@ function declineRequest(id) {
     renderInbox();
 }
 
-// ── SIDEBAR ───────────────────────────────────────────────
+// â”€â”€ SIDEBAR â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 var hamburger = document.getElementById("hamburger");
 var sidebar   = document.getElementById("sidebar");
 var overlay   = document.getElementById("overlay");
@@ -462,7 +463,7 @@ function closeSidebar() {
     hamburger.classList.remove("active");
 }
 
-// ── INIT ──────────────────────────────────────────────────
+// â”€â”€ INIT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 showInbox();
 </script>
 

@@ -1,11 +1,12 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Brainstorm</title>
 <style>
-* { margin:0; padding:0; box-sizing:border-box; font-family:Arial,Helvetica,sans-serif; }
+* { margin:0; padding:0; box-sizing:border-box; font-family:'Inter',system-ui,sans-serif; }
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 body { background:#f4f5f8; min-height:100vh; display:flex; flex-direction:column; }
 
 /* HAMBURGER */
@@ -99,7 +100,7 @@ body { background:#f4f5f8; min-height:100vh; display:flex; flex-direction:column
 .empty-state { text-align:center; padding:60px 20px; color:#bbb; font-size:15px; }
 .empty-icon { font-size:48px; margin-bottom:12px; }
 
-/* ── WELCOME POPUP ── */
+/* â”€â”€ WELCOME POPUP â”€â”€ */
 .welcome-bg {
     position:fixed; inset:0; background:rgba(0,0,0,.5);
     z-index:4000; display:flex; align-items:center; justify-content:center; padding:20px;
@@ -122,7 +123,7 @@ body { background:#f4f5f8; min-height:100vh; display:flex; flex-direction:column
 .welcome-check { display:flex; align-items:center; gap:8px; justify-content:center; margin-bottom:20px; font-size:13px; color:#888; cursor:pointer; }
 .welcome-check input { accent-color:#6d28d9; width:15px; height:15px; cursor:pointer; }
 
-/* ── CREATE POST MODAL ── */
+/* â”€â”€ CREATE POST MODAL â”€â”€ */
 .modal-bg {
     position:fixed; inset:0; background:rgba(0,0,0,.45);
     z-index:3000; display:none; align-items:center; justify-content:center; padding:20px;
@@ -201,28 +202,28 @@ footer { background:#0f0a1e; color:rgba(255,255,255,.45); text-align:center; pad
 <div class="overlay" id="sideOverlay" onclick="closeSidebar()"></div>
 <aside class="sidebar" id="sidebar">
     <div class="sidebar-header">
-        <div class="sidebar-logo">LOGO</div>
-        <div class="sidebar-subtitle">Student Portal</div>
+        <a href="home.html" class="sidebar-logo" style="display:flex;align-items:center;gap:10px;text-decoration:none"><div style="width:32px;height:32px;background:linear-gradient(135deg,#5b21b6,#a78bfa);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px">🎓</div><div style="font-size:19px;font-weight:800;color:#7c3aed;letter-spacing:-0.5px">CHIPIN</div></a>
+        <div class="sidebar-subtitle">College Developer Portal</div>
     </div>
     <ul class="sidebar-links">
-        <li><a href="home.html">Home</a></li>
+        <li><a href="home.html">🏠 Home</a></li><li><a href="mates.html">👥 View Mates</a></li>
         <li><a href="urprofile.html">Your Profile</a></li>
         <li><a href="message.html">Messages</a></li>
         <li><a href="job.html">Jobs</a></li>
         <li><a href="brainstorm.html" class="active">Brainstorm</a></li>
         <li><a href="contact.html">Contact</a></li>
     </ul>
-    <div class="sidebar-footer">© 2026 Your Website</div>
+    <div class="sidebar-footer">Â© 2026 CHIPIN • College Portal</div>
 </aside>
 
 <!-- WELCOME POPUP -->
 <div class="welcome-bg" id="welcomeBg">
     <div class="welcome-box">
-        <div class="welcome-icon">💡</div>
+        <div class="welcome-icon">ðŸ’¡</div>
         <div class="welcome-title">Welcome to Brainstorm</div>
         <div class="welcome-text">
             This is your open space to share ideas freely.<br>
-            <span class="welcome-highlight">Everything you post becomes public property</span> — no ownership, no credit. Just pure ideas for everyone to build on.
+            <span class="welcome-highlight">Everything you post becomes public property</span> â€” no ownership, no credit. Just pure ideas for everyone to build on.
         </div>
         <label class="welcome-check">
             <input type="checkbox" id="dontShowAgain"> Don't show this again
@@ -236,7 +237,7 @@ footer { background:#0f0a1e; color:rgba(255,255,255,.45); text-align:center; pad
     <div class="modal">
         <div class="modal-header">
             <div class="modal-title">Share your idea</div>
-            <button class="modal-close-btn" onclick="closeCreate()">×</button>
+            <button class="modal-close-btn" onclick="closeCreate()">Ã—</button>
         </div>
         <div class="modal-body">
             <input class="m-input" id="postTitle" type="text" placeholder="Give your idea a title...">
@@ -274,30 +275,30 @@ footer { background:#0f0a1e; color:rgba(255,255,255,.45); text-align:center; pad
 </div>
 
 <div class="toast" id="toast"></div>
-<footer>© 2026 Your Website. All Rights Reserved.</footer>
+<footer>Â© 2026 CHIPIN • College Portal. All Rights Reserved.</footer>
 
 <script>
 var currentSort = "hot";
 var imgData     = null;
 
-// ── STORAGE ───────────────────────────────────────────────
+// â”€â”€ STORAGE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function getPosts()     { try { return JSON.parse(localStorage.getItem("bsPosts") || "[]"); } catch(e) { return []; } }
 function savePosts(p)   { localStorage.setItem("bsPosts", JSON.stringify(p)); }
 function getVotes()     { try { return JSON.parse(localStorage.getItem("bsVotes") || "{}"); } catch(e) { return {}; } }
 function saveVotes(v)   { localStorage.setItem("bsVotes", JSON.stringify(v)); }
 
-// ── SEED POSTS ────────────────────────────────────────────
+// â”€â”€ SEED POSTS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 (function seed() {
     if (getPosts().length > 0) return;
     var now = Date.now();
     savePosts([
         { id:"p1", author:"Reza",    initial:"R", title:"AI-powered study planner", text:"What if we had an AI that analyzes your syllabus and auto-generates a personalized weekly study schedule, adjusting based on your exam dates and weak topics?", img:null, votes:42, ts: now - 7200000 },
-        { id:"p2", author:"Ali",     initial:"A", title:"Peer-to-peer skill exchange", text:"A platform where students trade skills — I teach you web dev, you teach me graphic design. No money, just time and knowledge.", img:null, votes:31, ts: now - 3600000 },
+        { id:"p2", author:"Ali",     initial:"A", title:"Peer-to-peer skill exchange", text:"A platform where students trade skills â€” I teach you web dev, you teach me graphic design. No money, just time and knowledge.", img:null, votes:31, ts: now - 3600000 },
         { id:"p3", author:"Visitor", initial:"V", title:"Campus carbon tracker", text:"An app that lets students log daily activities (food, transport, electricity use) and see their carbon footprint in real time, with tips to reduce it.", img:null, votes:18, ts: now - 1800000 }
     ]);
 })();
 
-// ── WELCOME ───────────────────────────────────────────────
+// â”€â”€ WELCOME â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 (function checkWelcome() {
     if (localStorage.getItem("bsWelcomeSeen") === "true") {
         document.getElementById("welcomeBg").style.display = "none";
@@ -311,7 +312,7 @@ function closeWelcome() {
     document.getElementById("welcomeBg").style.display = "none";
 }
 
-// ── SORT ──────────────────────────────────────────────────
+// â”€â”€ SORT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function setSort(s) {
     currentSort = s;
     ["Hot","New","Top"].forEach(function(n) {
@@ -334,7 +335,7 @@ function sortedPosts() {
     });
 }
 
-// ── RENDER FEED ───────────────────────────────────────────
+// â”€â”€ RENDER FEED â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function renderFeed() {
     var posts = sortedPosts();
     var votes = getVotes();
@@ -342,7 +343,7 @@ function renderFeed() {
     feed.innerHTML = "";
 
     if (posts.length === 0) {
-        feed.innerHTML = '<div class="empty-state"><div class="empty-icon">💭</div><div>No ideas yet — be the first!</div></div>';
+        feed.innerHTML = '<div class="empty-state"><div class="empty-icon">ðŸ’­</div><div>No ideas yet â€” be the first!</div></div>';
         return;
     }
 
@@ -356,15 +357,15 @@ function renderFeed() {
 
         card.innerHTML =
             '<div class="vote-col">' +
-                '<button class="vote-btn up '+(myVote===1?"active":"")+'" onclick="vote(\''+p.id+'\',1)">▲</button>' +
+                '<button class="vote-btn up '+(myVote===1?"active":"")+'" onclick="vote(\''+p.id+'\',1)">â–²</button>' +
                 '<div class="vote-count" id="vc_'+p.id+'">'+(p.votes)+'</div>' +
-                '<button class="vote-btn down '+(myVote===-1?"active":"")+'" onclick="vote(\''+p.id+'\',-1)">▼</button>' +
+                '<button class="vote-btn down '+(myVote===-1?"active":"")+'" onclick="vote(\''+p.id+'\',-1)">â–¼</button>' +
             '</div>' +
             '<div class="post-body">' +
                 '<div class="post-meta">' +
                     '<div class="post-avatar">'+escHtml(p.initial)+'</div>' +
                     '<div class="post-author">'+escHtml(p.author)+'</div>' +
-                    '<div class="post-time">• '+timeStr+'</div>' +
+                    '<div class="post-time">â€¢ '+timeStr+'</div>' +
                 '</div>' +
                 '<div class="post-title">'+escHtml(p.title)+'</div>' +
                 (p.text ? '<div class="post-text">'+escHtml(p.text)+'</div>' : '') +
@@ -375,7 +376,7 @@ function renderFeed() {
     });
 }
 
-// ── VOTE ──────────────────────────────────────────────────
+// â”€â”€ VOTE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function vote(id, dir) {
     var posts  = getPosts();
     var votes  = getVotes();
@@ -399,7 +400,7 @@ function vote(id, dir) {
     renderFeed();
 }
 
-// ── CREATE POST ───────────────────────────────────────────
+// â”€â”€ CREATE POST â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function openCreate() { document.getElementById("createModal").classList.add("open"); }
 function closeCreate() {
     document.getElementById("createModal").classList.remove("open");
@@ -449,7 +450,7 @@ function submitPost() {
     showToast("Idea shared with the world!");
 }
 
-// ── LIGHTBOX ──────────────────────────────────────────────
+// â”€â”€ LIGHTBOX â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function openLightbox(id) {
     var posts = getPosts();
     var post  = posts.find(function(p){ return p.id === id; });
@@ -459,7 +460,7 @@ function openLightbox(id) {
 }
 function closeLightbox() { document.getElementById("lightbox").classList.remove("open"); }
 
-// ── UTILS ─────────────────────────────────────────────────
+// â”€â”€ UTILS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function escHtml(str) { return String(str).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
 function timeAgo(ts) {
     var diff = Math.floor((Date.now() - ts) / 1000);
@@ -475,7 +476,7 @@ function showToast(msg) {
     setTimeout(function(){ t.classList.remove("show"); }, 3000);
 }
 
-// ── SIDEBAR ───────────────────────────────────────────────
+// â”€â”€ SIDEBAR â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 var hamburger  = document.getElementById("hamburger");
 var sidebar    = document.getElementById("sidebar");
 var sideOverlay= document.getElementById("sideOverlay");
@@ -490,7 +491,7 @@ function closeSidebar() {
     hamburger.classList.remove("active");
 }
 
-// ── INIT ──────────────────────────────────────────────────
+// â”€â”€ INIT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 renderFeed();
 </script>
 </body>

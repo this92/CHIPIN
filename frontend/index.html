@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CHIPIN — Join Your College Room</title>
+<meta name="description" content="CHIPIN: The college developer portal. Enter your room code to connect with your batchmates.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+:root {
+    --primary: #7c3aed;
+    --primary-dark: #5b21b6;
+    --accent: #fde68a;
+    --font: 'Inter', system-ui, sans-serif;
+}
+
+body {
+    font-family: var(--font);
+    background: #0b0618;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+}
+
+/* animated bg blobs */
+.blob {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(100px);
+    pointer-events: none;
+    animation: float 8s ease-in-out infinite;
+}
+.blob-1 { width:500px; height:500px; background:#7c3aed; opacity:.18; top:-120px; left:-100px; animation-delay:0s; }
+.blob-2 { width:400px; height:400px; background:#a855f7; opacity:.13; bottom:-80px; right:-80px; animation-delay:3s; }
+.blob-3 { width:300px; height:300px; background:#fbbf24; opacity:.08; top:50%; left:60%; animation-delay:5s; }
+
+@keyframes float {
+    0%,100% { transform: translateY(0) scale(1); }
+    50%      { transform: translateY(-30px) scale(1.05); }
+}
+
+/* grid overlay */
+body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+        linear-gradient(rgba(124,58,237,.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(124,58,237,.06) 1px, transparent 1px);
+    background-size: 44px 44px;
+    pointer-events: none;
+}
+
+/* card */
+.card {
+    position: relative;
+    z-index: 10;
+    background: rgba(255,255,255,.04);
+    border: 1px solid rgba(255,255,255,.1);
+    backdrop-filter: blur(20px);
+    border-radius: 24px;
+    padding: 48px 44px 44px;
+    width: 100%;
+    max-width: 440px;
+    margin: 20px;
+    box-shadow: 0 32px 80px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.1);
+    animation: slideUp .5s cubic-bezier(.4,0,.2,1);
+}
+
+@keyframes slideUp {
+    from { opacity:0; transform:translateY(30px); }
+    to   { opacity:1; transform:translateY(0); }
+}
+
+/* logo */
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 32px;
+}
+.logo-icon {
+    width: 44px;
+    height: 44px;
+    background: linear-gradient(135deg, #5b21b6, #a78bfa);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    box-shadow: 0 4px 16px rgba(124,58,237,.5);
+}
+.logo-text { font-size: 26px; font-weight: 800; color: white; letter-spacing: -1px; }
+.logo-badge {
+    margin-left: auto;
+    background: rgba(253,230,138,.15);
+    border: 1px solid rgba(253,230,138,.3);
+    color: var(--accent);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 20px;
+    letter-spacing: .5px;
+}
+
+h1 {
+    font-size: 26px;
+    font-weight: 800;
+    color: white;
+    line-height: 1.25;
+    margin-bottom: 8px;
+    letter-spacing: -.5px;
+}
+.subtitle {
+    font-size: 14px;
+    color: rgba(255,255,255,.5);
+    margin-bottom: 32px;
+    line-height: 1.6;
+}
+
+/* form */
+.form-group { margin-bottom: 16px; }
+label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: rgba(255,255,255,.5);
+    letter-spacing: .6px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+}
+.input-wrap {
+    position: relative;
+}
+.input-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 16px;
+    pointer-events: none;
+}
+input[type="text"], select {
+    width: 100%;
+    background: rgba(255,255,255,.07);
+    border: 1.5px solid rgba(255,255,255,.12);
+    border-radius: 12px;
+    padding: 13px 14px 13px 42px;
+    font-size: 15px;
+    font-family: var(--font);
+    color: white;
+    outline: none;
+    transition: border-color .2s, background .2s;
+    -webkit-appearance: none;
+}
+select option { background: #1a0a2e; color: white; }
+input::placeholder { color: rgba(255,255,255,.3); }
+input:focus, select:focus {
+    border-color: #a78bfa;
+    background: rgba(124,58,237,.12);
+}
+
+/* room code special */
+.room-input-wrap { position: relative; }
+.room-tag {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(253,230,138,.15);
+    color: var(--accent);
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 6px;
+    letter-spacing: .5px;
+    pointer-events: none;
+}
+
+/* grid for two fields */
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+/* divider */
+.divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 20px 0;
+    color: rgba(255,255,255,.25);
+    font-size: 12px;
+}
+.divider::before, .divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(255,255,255,.1);
+}
+
+/* submit */
+.submit-btn {
+    width: 100%;
+    background: linear-gradient(135deg, #7c3aed, #a855f7);
+    color: white;
+    border: none;
+    padding: 15px;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 700;
+    font-family: var(--font);
+    cursor: pointer;
+    transition: all .2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: 0 4px 20px rgba(124,58,237,.4);
+    margin-top: 8px;
+    letter-spacing: -.2px;
+}
+.submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 28px rgba(124,58,237,.55);
+}
+.submit-btn:active { transform: translateY(0); }
+.submit-btn:disabled { opacity: .6; cursor: not-allowed; transform: none; }
+
+/* error */
+.error-msg {
+    display: none;
+    background: rgba(239,68,68,.15);
+    border: 1px solid rgba(239,68,68,.3);
+    color: #fca5a5;
+    padding: 12px 16px;
+    border-radius: 10px;
+    font-size: 13px;
+    margin-top: 14px;
+    text-align: center;
+}
+.error-msg.show { display: block; }
+
+/* hint */
+.hint {
+    text-align: center;
+    font-size: 12px;
+    color: rgba(255,255,255,.3);
+    margin-top: 20px;
+}
+.hint strong { color: rgba(255,255,255,.5); }
+
+/* stats strip */
+.stats {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 28px;
+    padding-top: 24px;
+    border-top: 1px solid rgba(255,255,255,.08);
+}
+.stat-item { text-align: center; }
+.stat-num { font-size: 22px; font-weight: 800; color: white; }
+.stat-label { font-size: 11px; color: rgba(255,255,255,.35); margin-top: 2px; letter-spacing: .4px; }
+</style>
+</head>
+<body>
+<div class="blob blob-1"></div>
+<div class="blob blob-2"></div>
+<div class="blob blob-3"></div>
+
+<div class="card">
+    <div class="logo">
+        <div class="logo-icon">🎓</div>
+        <div class="logo-text">CHIPIN</div>
+        <div class="logo-badge">BETA</div>
+    </div>
+
+    <h1>Join your college room</h1>
+    <p class="subtitle">Enter your room code to connect with batchmates, share projects, and grow together.</p>
+
+    <form id="loginForm" onsubmit="handleLogin(event)">
+        <div class="form-group">
+            <label>Room Code</label>
+            <div class="input-wrap room-input-wrap">
+                <span class="input-icon">🔑</span>
+                <input type="text" id="roomCode" placeholder="e.g. 107" maxlength="10" autocomplete="off" required>
+                <span class="room-tag" id="roomTag" style="display:none"></span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Full Name</label>
+            <div class="input-wrap">
+                <span class="input-icon">👤</span>
+                <input type="text" id="fullName" placeholder="Your full name" required>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Roll Number</label>
+            <div class="input-wrap">
+                <span class="input-icon">🪪</span>
+                <input type="text" id="rollNo" placeholder="e.g. BCA-FY-A-01" required>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group" style="margin-bottom:0">
+                <label>Year</label>
+                <div class="input-wrap">
+                    <span class="input-icon">📅</span>
+                    <select id="year" required>
+                        <option value="">Select</option>
+                        <option value="FY">FY</option>
+                        <option value="SY">SY</option>
+                        <option value="TY">TY</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group" style="margin-bottom:0">
+                <label>Division</label>
+                <div class="input-wrap">
+                    <span class="input-icon">🏷️</span>
+                    <select id="division" required>
+                        <option value="">Select</option>
+                        <option value="A">A</option>
+                        <option value="B">B</option>
+                        <option value="C">C</option>
+                        <option value="D">D</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <button type="submit" class="submit-btn" id="submitBtn">
+            <span>🚀</span> Enter Room
+        </button>
+        <div class="error-msg" id="errorMsg"></div>
+    </form>
+
+    <div class="hint">
+        Try room code <strong>107</strong> for BCA • All divisions welcome
+    </div>
+
+    <div class="stats">
+        <div class="stat-item">
+            <div class="stat-num" id="statStudents">—</div>
+            <div class="stat-label">STUDENTS</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-num" id="statProjects">—</div>
+            <div class="stat-label">PROJECTS</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-num" id="statRooms">—</div>
+            <div class="stat-label">ROOMS</div>
+        </div>
+    </div>
+</div>
+
+<script>
+const API = 'http://127.0.0.1:8080/api';
+
+// Room code → label map (client-side hint only)
+const ROOM_LABELS = {
+    '107': 'BCA — All Divisions',
+    '108': 'BCS — All Divisions',
+    '109': 'BSc IT — All Divisions',
+};
+
+// Show room label hint as user types
+document.getElementById('roomCode').addEventListener('input', function() {
+    const tag = document.getElementById('roomTag');
+    const label = ROOM_LABELS[this.value.trim()];
+    if (label) {
+        tag.textContent = label;
+        tag.style.display = 'block';
+    } else {
+        tag.style.display = 'none';
+    }
+});
+
+async function handleLogin(e) {
+    e.preventDefault();
+    const btn = document.getElementById('submitBtn');
+    const err = document.getElementById('errorMsg');
+    err.classList.remove('show');
+
+    const payload = {
+        room_code: document.getElementById('roomCode').value.trim(),
+        name:      document.getElementById('fullName').value.trim(),
+        roll_no:   document.getElementById('rollNo').value.trim(),
+        year:      document.getElementById('year').value,
+        division:  document.getElementById('division').value,
+    };
+
+    if (!payload.room_code || !payload.name || !payload.roll_no || !payload.year || !payload.division) {
+        showError('Please fill in all fields.');
+        return;
+    }
+
+    btn.disabled = true;
+    btn.innerHTML = '<span>⏳</span> Joining…';
+
+    try {
+        const res = await fetch(`${API}/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+        });
+
+        if (!res.ok) {
+            const data = await res.json().catch(() => ({}));
+            throw new Error(data.error || `Server error ${res.status}`);
+        }
+
+        const student = await res.json();
+        // Store session
+        sessionStorage.setItem('chipin_student', JSON.stringify(student));
+        localStorage.setItem('chipin_student', JSON.stringify(student)); // persist across tabs
+        window.location.href = 'home.html';
+
+    } catch (ex) {
+        // Offline fallback: allow local demo mode
+        if (ex.message.includes('fetch') || ex.message.includes('Failed')) {
+            // Demo mode — store mock session
+            const mock = {
+                id: 'local-' + Date.now(),
+                name: payload.name,
+                roll_no: payload.roll_no,
+                room_code: payload.room_code,
+                year: payload.year,
+                division: payload.division,
+                course: ROOM_LABELS[payload.room_code] ? 'BCA' : 'Unknown',
+                tagline: '',
+                about: '',
+                skills: [],
+                avatar_url: null,
+                demo_mode: true,
+            };
+            sessionStorage.setItem('chipin_student', JSON.stringify(mock));
+            localStorage.setItem('chipin_student', JSON.stringify(mock));
+            window.location.href = 'home.html';
+        } else {
+            showError(ex.message);
+            btn.disabled = false;
+            btn.innerHTML = '<span>🚀</span> Enter Room';
+        }
+    }
+}
+
+function showError(msg) {
+    const err = document.getElementById('errorMsg');
+    err.textContent = '⚠ ' + msg;
+    err.classList.add('show');
+}
+
+// Load stats from backend (non-blocking)
+async function loadStats() {
+    try {
+        const res = await fetch(`${API}/stats`, { signal: AbortSignal.timeout(3000) });
+        if (!res.ok) return;
+        const data = await res.json();
+        document.getElementById('statStudents').textContent = data.students ?? '—';
+        document.getElementById('statProjects').textContent = data.projects ?? '—';
+        document.getElementById('statRooms').textContent    = data.rooms    ?? '—';
+    } catch(_) { /* backend offline — stats stay as dashes */ }
+}
+loadStats();
+
+// Redirect if already logged in
+const existing = localStorage.getItem('chipin_student');
+if (existing) {
+    try {
+        const s = JSON.parse(existing);
+        if (s && s.id) window.location.replace('home.html');
+    } catch(_) {}
+}
+</script>
+</body>
+</html>

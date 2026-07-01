@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CHIPIN — Loading</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@700;800&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background: #0b0618;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 28px;
+}
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    animation: fadeIn .5s;
+}
+.logo-icon {
+    width: 56px; height: 56px;
+    background: linear-gradient(135deg, #5b21b6, #a78bfa);
+    border-radius: 16px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px;
+    box-shadow: 0 8px 32px rgba(124,58,237,.5);
+}
+.logo-text { font-size: 32px; font-weight: 800; color: white; letter-spacing: -1px; }
+
+.spinner {
+    width: 44px; height: 44px;
+    border: 3px solid rgba(124,58,237,.2);
+    border-top-color: #a78bfa;
+    border-radius: 50%;
+    animation: spin .8s linear infinite;
+}
+
+.msg {
+    font-size: 14px;
+    color: rgba(255,255,255,.4);
+    letter-spacing: .5px;
+    animation: fadeIn .5s .2s both;
+}
+
+@keyframes spin    { to { transform:rotate(360deg); } }
+@keyframes fadeIn  { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:none; } }
+</style>
+</head>
+<body>
+<div class="logo">
+    <div class="logo-icon">🎓</div>
+    <div class="logo-text">CHIPIN</div>
+</div>
+<div class="spinner"></div>
+<div class="msg" id="msg">Entering your room…</div>
+<script>
+const msgs = ['Entering your room…','Loading mates…','Almost there…'];
+let i = 0;
+const el = document.getElementById('msg');
+setInterval(() => { i = (i+1)%msgs.length; el.textContent = msgs[i]; }, 900);
+setTimeout(() => { window.location.href = 'home.html'; }, 2000);
+</script>
+</body>
+</html>

@@ -1,11 +1,12 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Contacts</title>
 <style>
-* { margin:0; padding:0; box-sizing:border-box; font-family:Arial,Helvetica,sans-serif; }
+* { margin:0; padding:0; box-sizing:border-box; font-family:'Inter',system-ui,sans-serif; }
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 body { background:#f4f5f8; min-height:100vh; display:flex; flex-direction:column; }
 
 .hamburger {
@@ -109,11 +110,11 @@ footer { background:#0f0a1e; color:rgba(255,255,255,.45); text-align:center; pad
 <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
 <aside class="sidebar" id="sidebar">
     <div class="sidebar-header">
-        <div class="sidebar-logo">LOGO</div>
-        <div class="sidebar-subtitle">Student Portal</div>
+        <a href="home.html" class="sidebar-logo" style="display:flex;align-items:center;gap:10px;text-decoration:none"><div style="width:32px;height:32px;background:linear-gradient(135deg,#5b21b6,#a78bfa);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px">🎓</div><div style="font-size:19px;font-weight:800;color:#7c3aed;letter-spacing:-0.5px">CHIPIN</div></a>
+        <div class="sidebar-subtitle">College Developer Portal</div>
     </div>
     <ul <ul class="sidebar-links">
-        <li><a href="home.html">Home</a></li>
+        <li><a href="home.html">🏠 Home</a></li><li><a href="mates.html">👥 View Mates</a></li>
         <li><a href="urprofile.html">Your Profile</a></li>
         <li><a href="message.html">Messages</a></li>
         <li><a href="job.html">Jobs</a></li>
@@ -121,7 +122,7 @@ footer { background:#0f0a1e; color:rgba(255,255,255,.45); text-align:center; pad
         <li><a href="contact.html">Contact</a></li>
     </ul>
     </ul>
-    <div class="sidebar-footer">© 2026 Your Website</div>
+    <div class="sidebar-footer">Â© 2026 CHIPIN • College Portal</div>
 </aside>
 
 <div class="page">
@@ -139,12 +140,12 @@ footer { background:#0f0a1e; color:rgba(255,255,255,.45); text-align:center; pad
 </div>
 
 <div class="toast" id="toast"></div>
-<footer>© 2026 Your Website. All Rights Reserved.</footer>
+<footer>Â© 2026 CHIPIN • College Portal. All Rights Reserved.</footer>
 
 <script>
 var currentTab = "all";
 
-// ── DATA ─────────────────────────────────────────────────
+// â”€â”€ DATA â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Contacts are stored by message.html under key "contacts"
 // We also seed some outgoing requests here for demo purposes
 function getContacts() {
@@ -168,7 +169,7 @@ function saveContacts(c) { localStorage.setItem("contacts", JSON.stringify(c)); 
     saveContacts(contacts);
 })();
 
-// ── TABS ─────────────────────────────────────────────────
+// â”€â”€ TABS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function setTab(tab) {
     currentTab = tab;
     ["All","Accepted","Pending","Declined"].forEach(function(t) {
@@ -177,7 +178,7 @@ function setTab(tab) {
     render();
 }
 
-// ── RENDER ───────────────────────────────────────────────
+// â”€â”€ RENDER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function render() {
     var contacts = getContacts().filter(function(c){ return c.sentByMe; });
     if (currentTab !== "all") contacts = contacts.filter(function(c){ return c.status === currentTab; });
@@ -186,7 +187,7 @@ function render() {
     list.innerHTML = "";
 
     if (contacts.length === 0) {
-        list.innerHTML = '<div class="empty-state"><div class="empty-icon">👥</div><div>No contacts here yet</div></div>';
+        list.innerHTML = '<div class="empty-state"><div class="empty-icon">ðŸ‘¥</div><div>No contacts here yet</div></div>';
         return;
     }
 
@@ -244,7 +245,7 @@ function showToast(msg) {
     setTimeout(function(){ t.classList.remove("show"); }, 3000);
 }
 
-// ── SIDEBAR ───────────────────────────────────────────────
+// â”€â”€ SIDEBAR â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 var hamburger = document.getElementById("hamburger");
 var sidebar   = document.getElementById("sidebar");
 var overlay   = document.getElementById("overlay");
